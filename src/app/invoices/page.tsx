@@ -125,6 +125,7 @@ export default function InvoicesPage() {
             <CardTitle className="text-xl sm:text-2xl font-bold text-primary">Saved Invoices</CardTitle>
 
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                 {/* Changed Link href to "/" to point to the invoice creation page */}
                  <Link href="/" passHref legacyBehavior>
                     <Button variant="outline" size="sm" className="w-full sm:w-auto">
                         <PlusCircle className="mr-2 h-4 w-4" /> Create New Bill
