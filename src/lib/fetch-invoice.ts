@@ -3,23 +3,11 @@ import type { Invoice } from '@/app/invoices/page'; // Import the full Invoice t
 
 // Function to fetch a single invoice by ID
 export async function fetchInvoiceById(id: string): Promise<Invoice | null> {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
-
-    if (!baseUrl) {
-        console.error("FATAL: NEXT_PUBLIC_APP_URL environment variable is not set.");
-        throw new Error("Application configuration error: NEXT_PUBLIC_APP_URL is missing.");
-    }
-
-    const apiUrl = `${baseUrl}/api/invoices/${id}`;
+    // Use relative URL path directly in client components
+    const apiUrl = `/api/invoices/${id}`;
     console.log(`Fetching invoice from: ${apiUrl}`);
 
-     try {
-        new URL(apiUrl); // Validate the constructed URL
-    } catch (urlError: any) {
-        console.error(`Invalid API URL constructed: ${apiUrl}`, urlError);
-        throw new Error(`Failed to construct valid API URL for fetching invoice ${id}. Base URL: ${baseUrl}. Error: ${urlError.message}`);
-    }
-
+     // No need to validate URL construction with relative paths
 
     try {
         const response = await fetch(apiUrl, {
@@ -55,8 +43,10 @@ export async function fetchInvoiceById(id: string): Promise<Invoice | null> {
         console.log(`Successfully fetched invoice ${id}.`);
         // Ensure dates are Dates (Mongoose returns ISO strings)
         const invoiceData = result.data as Invoice;
-        invoiceData.invoiceDate = new Date(invoiceData.invoiceDate);
-        invoiceData.dueDate = new Date(invoiceData.dueDate);
+        // Convert date strings from API to Date objects if needed by the consuming component
+        // Note: Input type="date" expects YYYY-MM-DD string format
+        // invoiceData.invoiceDate = new Date(invoiceData.invoiceDate);
+        // invoiceData.dueDate = new Date(invoiceData.dueDate);
 
         return invoiceData;
 
