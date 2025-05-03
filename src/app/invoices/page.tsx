@@ -1,3 +1,4 @@
+
 'use client'; // Keep as client component due to state management for invoices, filters, loading, and errors
 
 import { useState, useEffect } from 'react';
@@ -113,15 +114,7 @@ export default function InvoicesPage() {
       <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Rounded Card */}
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b p-4 sm:p-6 bg-card"> {/* Header background */}
             <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Saved Invoices</CardTitle> {/* Adjusted size/weight */}
-
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                 <Link href="/invoices/new" passHref legacyBehavior>
-                     {/* Primary button style */}
-                    <Button size="sm" className="w-full sm:w-auto">
-                        <PlusCircle className="mr-2 h-4 w-4" /> Create New Bill
-                    </Button>
-                 </Link>
-            </div>
+            {/* Moved Create Button to CardContent */}
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
             <InvoiceFilters
@@ -134,6 +127,15 @@ export default function InvoicesPage() {
              />
 
             <Separator className="my-4 sm:my-6" />
+
+             {/* Moved Create Button Here */}
+             <div className="flex justify-start mb-4 sm:mb-6"> {/* Position button before the switcher */}
+                 <Link href="/invoices/new" passHref legacyBehavior>
+                     <Button size="sm" className="w-auto">
+                         <PlusCircle className="mr-2 h-4 w-4" /> Create New Bill
+                     </Button>
+                 </Link>
+             </div>
 
             {isLoading ? (
                  // Show a loading indicator (Skeleton) while fetching
