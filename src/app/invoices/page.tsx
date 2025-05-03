@@ -110,7 +110,7 @@ export default function InvoicesPage() {
     <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
       <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Rounded Card */}
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b p-4 sm:p-6 bg-card"> {/* Header background */}
-            <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Saved Invoices</CardTitle> {/* Adjusted size/weight */}
+            <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Invoice</CardTitle> {/* Adjusted size/weight */}
             {/* Create Button is now moved inside InvoiceViewSwitcher */}
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
@@ -165,3 +165,4 @@ export default function InvoicesPage() {
     </main>
   );
 }
+
