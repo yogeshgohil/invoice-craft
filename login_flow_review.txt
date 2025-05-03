@@ -1,0 +1,49 @@
+
+Okay, I will review the login flow based on the current code implementation.
+
+1.  **User navigates to `/login`:**
+    *   The `LoginPage` component (`src/app/login/page.tsx`) renders.
+    *   It checks the `isLoggedIn` state from `AuthContext`. If the user is somehow already logged in (e.g., valid cookie/localStorage exists from a previous session), the `useEffect` hook should redirect them to `/invoices`.
+2.  **User enters credentials and clicks Login:**
+    *   The `handleSubmit` function in `LoginPage` is called.
+    *   It calls the `login(username, password)` function from `AuthContext`.
+3.  **`AuthContext.login` executes:**
+    *   It compares the provided `username` and `password` against the hardcoded `VALID_USERNAME` and `VALID_PASSWORD`.
+    *   **If credentials match:**
+        *   It sets the `isLoggedIn` state to `true` and updates the `username` state within the context.
+        *   It attempts to save the auth state (`{ isLoggedIn: true, username: user }`) to `localStorage`.
+        *   It sets the `app_auth_state` cookie with the same auth state, ensuring `path=/`.
+        *   It returns `true` to the `handleSubmit` function.
+    *   **If credentials do NOT match:**
+        *   It returns `false`.
+4.  **`handleSubmit` continues (Success Case):**
+    *   Since `login` returned `true`, it shows the "Login Successful" toast.
+    *   Crucially, it **does not** call `router.push` or `router.replace` directly here anymore.
+5.  **State Update Triggers `useEffect` in `LoginPage`:**
+    *   The `isLoggedIn` state within `AuthContext` has changed to `true`.
+    *   The `useEffect` hook within `LoginPage` depends on `[isLoggedIn, router]`. Since `isLoggedIn` changed, the effect runs.
+    *   Inside the effect, it checks `if (isLoggedIn)`. Since it's now `true`, it executes `router.replace('/invoices')`.
+6.  **Navigation to `/invoices`:**
+    *   The browser attempts to navigate to `/invoices`.
+7.  **Middleware intercepts the request to `/invoices`:**
+    *   The middleware (`src/middleware.ts`) runs.
+    *   It reads the `app_auth_state` cookie (which should have been set in step 3).
+    *   It parses the cookie and determines `isAuthenticated` is `true`.
+    *   Since the user is authenticated and accessing `/invoices` (a protected route), the middleware allows the request using `NextResponse.next()`.
+8.  **`/invoices` page loads:**
+    *   The `InvoicesPage` component (`src/app/invoices/page.tsx`) renders.
+
+**Conclusion based on review:**
+
+The flow appears logically sound. The redirection is now handled by the `useEffect` hook reacting to the state change in the `AuthContext`, which is a standard pattern. The middleware correctly checks the cookie set by the context upon successful login to authorize access to protected routes.
+
+If the redirect is still failing after the "Login Successful" toast appears:
+
+1.  **Check Browser Console:** Look for any errors during the `router.replace('/invoices')` call or any subsequent errors when trying to load the `/invoices` page.
+2.  **Check Middleware Logs:** Verify the console logs within `src/middleware.ts` to confirm it's correctly reading the cookie and determining `isAuthenticated = true` when the request for `/invoices` comes through after login.
+3.  **Check Network Tab:** Ensure the request to `/invoices` is actually being made after the login attempt and check its status code.
+4.  **`AuthContext` State:** Add temporary `console.log` inside the `AuthContext` `useEffect` that monitors `isLoggedIn` to be absolutely sure the state is updating as expected after login.
+
+Based on the code, the mechanism for redirecting after a successful login via the `useEffect` hook is correctly implemented.
+
+    
