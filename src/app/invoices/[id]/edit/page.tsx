@@ -1,3 +1,4 @@
+
 import { InvoiceForm } from '@/components/invoice-form';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'; // Added CardDescription
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import type { Invoice } from '@/app/invoices/page'; // Import the full Invoice type
 import { fetchInvoiceById } from '@/lib/fetch-invoice'; // Import the refactored fetch function
+import { notFound } from 'next/navigation'; // Import notFound
 
 // Define props for the page, including params for the ID
 interface EditInvoicePageProps {
@@ -20,21 +22,25 @@ export default async function EditInvoicePage({ params }: EditInvoicePageProps) 
   try {
     invoice = await fetchInvoiceById(id);
   } catch (error: any) {
-    console.error("Error fetching invoice for edit page:", error);
+    console.error(`Error fetching invoice ${id} for edit page:`, error);
+    // Capture the specific error message from the fetch function
     fetchError = error.message || "An unknown error occurred while loading the invoice data.";
   }
 
-  if (fetchError) {
-    // Display a user-friendly error message (uses the new ErrorDisplay component implicitly via error.tsx)
-    // Throwing the error will automatically be caught by the nearest error.tsx boundary
-     throw new Error(fetchError);
+  // If fetchInvoiceById returned null, it means the invoice wasn't found (404)
+  if (!invoice && !fetchError) {
+    notFound(); // Use Next.js notFound() for clearer 404 handling
   }
 
+  // If there was a fetch error (other than 404), throw it to trigger error.tsx
+  if (fetchError) {
+     throw new Error(fetchError); // Propagate the specific fetch error
+  }
+
+  // If invoice is somehow still null here (shouldn't happen if logic above is correct), treat as not found
   if (!invoice) {
-    // Handle case where invoice is not found (e.g., invalid ID)
-    // This scenario should ideally be caught by the API returning 404,
-    // which fetchInvoiceById translates to returning null.
-     throw new Error("Invoice not found."); // Throw error to be caught by error.tsx
+      console.error(`Invoice ${id} was unexpectedly null after fetch attempt without explicit error.`);
+      notFound();
   }
 
   // Render the form with initial data
