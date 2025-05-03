@@ -5,12 +5,11 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { PlusCircle } from 'lucide-react'; // Removed LogOut icon
+import { PlusCircle } from 'lucide-react';
 import type { InvoiceFormData } from '@/components/invoice-form';
 import { InvoiceFilters } from '@/components/invoice-filters';
 import { Separator } from '@/components/ui/separator';
 import { InvoiceViewSwitcher } from '@/components/invoice-view-switcher';
-// Removed: import { useAuth } from '@/context/AuthContext';
 import { useSearchParams } from 'next/navigation';
 
 // Define the structure of the invoice object expected from the API
@@ -91,7 +90,6 @@ export default function InvoicesPage() {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true); // Add loading state
-    // Removed: const { logout, username } = useAuth();
     const searchParams = useSearchParams(); // Use hook to get searchParams
 
     // Extract filter values from searchParams, providing defaults or undefined
@@ -124,10 +122,7 @@ export default function InvoicesPage() {
     <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-12 lg:p-24 bg-background">
       <Card className="w-full max-w-7xl shadow-lg">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b mb-4 p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <CardTitle className="text-xl sm:text-2xl font-bold text-primary">Saved Invoices</CardTitle>
-                 {/* Removed username display */}
-            </div>
+            <CardTitle className="text-xl sm:text-2xl font-bold text-primary">Saved Invoices</CardTitle>
 
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                  <Link href="/" passHref legacyBehavior>
@@ -135,7 +130,6 @@ export default function InvoicesPage() {
                         <PlusCircle className="mr-2 h-4 w-4" /> Create New Bill
                     </Button>
                  </Link>
-                {/* Removed Logout Button */}
             </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">

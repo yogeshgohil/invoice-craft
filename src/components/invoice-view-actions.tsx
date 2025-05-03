@@ -3,15 +3,13 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer, Edit } from 'lucide-react'; // Removed LogOut
-// Removed: import { useAuth } from '@/context/AuthContext'; // Import useAuth
+import { ArrowLeft, Printer, Edit } from 'lucide-react';
 
 interface InvoiceViewActionsProps {
   invoiceId: string;
 }
 
 export function InvoiceViewActions({ invoiceId }: InvoiceViewActionsProps) {
-  // Removed: const { logout } = useAuth(); // Get logout function
 
   const handlePrint = () => {
     // Ensure this only runs on the client
@@ -35,7 +33,6 @@ export function InvoiceViewActions({ invoiceId }: InvoiceViewActionsProps) {
       <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={handlePrint}>
         <Printer className="mr-2 h-4 w-4" /> Print
       </Button>
-       {/* Removed Logout Button */}
       {/* Future: Download button might require more complex client-side PDF generation logic */}
       {/* <Button variant="outline" size="sm" className="w-full sm:w-auto">
         <Download className="mr-2 h-4 w-4" /> Download PDF
