@@ -1,17 +1,17 @@
 
-'use client'; // Make this a Client Component to use hooks
+'use client'; // Keep as client component due to state management for invoices, filters, loading, and errors
 
-import { useState, useEffect } from 'react'; // Import hooks
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { PlusCircle, LogOut } from 'lucide-react'; // Import LogOut icon
+import { PlusCircle } from 'lucide-react'; // Removed LogOut icon
 import type { InvoiceFormData } from '@/components/invoice-form';
 import { InvoiceFilters } from '@/components/invoice-filters';
 import { Separator } from '@/components/ui/separator';
 import { InvoiceViewSwitcher } from '@/components/invoice-view-switcher';
-import { useAuth } from '@/context/AuthContext'; // Import useAuth
-import { useSearchParams } from 'next/navigation'; // Import useSearchParams
+// Removed: import { useAuth } from '@/context/AuthContext';
+import { useSearchParams } from 'next/navigation';
 
 // Define the structure of the invoice object expected from the API
 export interface Invoice extends InvoiceFormData {
@@ -44,15 +44,10 @@ async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
     if (filters.dueDateStart) queryParams.append('dueDateStart', filters.dueDateStart);
     if (filters.dueDateEnd) queryParams.append('dueDateEnd', filters.dueDateEnd);
 
-    const apiUrl = `${baseUrl}/api/invoices?${queryParams.toString()}`;
+    const apiUrl = `/api/invoices?${queryParams.toString()}`; // Use relative URL
     console.log(`Fetching invoices from: ${apiUrl}`);
 
-    try {
-        new URL(apiUrl);
-    } catch (urlError: any) {
-        console.error(`Invalid API URL constructed: ${apiUrl}`, urlError);
-        throw new Error(`Failed to construct valid API URL using base: ${baseUrl}. Error: ${urlError.message}`);
-    }
+    // No need to validate relative URL with new URL()
 
     try {
         const response = await fetch(apiUrl, {
@@ -86,7 +81,9 @@ async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
         if (error instanceof Error && (error.message.startsWith("Application is not configured correctly") || error.message.startsWith("Failed to construct valid API URL"))) {
              throw error;
         }
-        throw new Error(`Failed to load invoices. Please check the API connection or try again later. Original error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        // Ensure the error message is propagated correctly
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        throw new Error(`Failed to load invoices. Please check the API connection or try again later. Original error: ${errorMessage}`);
     }
 }
 
@@ -94,7 +91,7 @@ export default function InvoicesPage() {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true); // Add loading state
-    const { logout, username } = useAuth(); // Get logout function and username
+    // Removed: const { logout, username } = useAuth();
     const searchParams = useSearchParams(); // Use hook to get searchParams
 
     // Extract filter values from searchParams, providing defaults or undefined
@@ -129,7 +126,7 @@ export default function InvoicesPage() {
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b mb-4 p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <CardTitle className="text-xl sm:text-2xl font-bold text-primary">Saved Invoices</CardTitle>
-                 {username && <span className="text-xs sm:text-sm text-muted-foreground">(Logged in as: {username})</span>}
+                 {/* Removed username display */}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -138,9 +135,7 @@ export default function InvoicesPage() {
                         <PlusCircle className="mr-2 h-4 w-4" /> Create New Bill
                     </Button>
                  </Link>
-                <Button variant="outline" size="sm" onClick={logout} className="w-full sm:w-auto">
-                    <LogOut className="mr-2 h-4 w-4" /> Logout
-                </Button>
+                {/* Removed Logout Button */}
             </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">

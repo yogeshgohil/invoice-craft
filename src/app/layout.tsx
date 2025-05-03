@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster'; // Import Toaster
-import { AuthProvider } from '@/context/AuthContext'; // Import AuthProvider
+// Removed: import { AuthProvider } from '@/context/AuthContext'; // Import AuthProvider
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -39,10 +39,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-         <AuthProvider> {/* Wrap children with AuthProvider */}
-           {children}
-           <Toaster /> {/* Add Toaster here */}
-         </AuthProvider>
+         {/* Removed AuthProvider wrapper */}
+         {children}
+         <Toaster /> {/* Add Toaster here */}
       </body>
     </html>
   );

@@ -1,15 +1,15 @@
 
-'use client'; // Make this a Client Component to use hooks
+'use client'; // Keep as client for now due to form interactions
 
 import { InvoiceForm } from '@/components/invoice-form';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { List, LogOut } from 'lucide-react'; // Import List and LogOut icons
-import { useAuth } from '@/context/AuthContext'; // Import useAuth
+import { List } from 'lucide-react'; // Removed LogOut icon
+// Removed: import { useAuth } from '@/context/AuthContext'; // Import useAuth
 
 export default function Home() {
-   const { logout, username } = useAuth(); // Get logout function and username
+   // Removed: const { logout, username } = useAuth(); // Get logout function and username
 
   return (
     // Use responsive padding: smaller padding on mobile, larger on desktop
@@ -19,7 +19,7 @@ export default function Home() {
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <CardTitle className="text-xl sm:text-2xl font-bold text-primary">Create Bill</CardTitle>
-                {username && <span className="text-xs sm:text-sm text-muted-foreground">(Logged in as: {username})</span>}
+                {/* Removed username display */}
              </div>
              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                  <Link href="/invoices" passHref legacyBehavior>
@@ -27,9 +27,7 @@ export default function Home() {
                         <List className="mr-2 h-4 w-4" /> View Saved Invoices
                     </Button>
                  </Link>
-                  <Button variant="outline" size="sm" onClick={logout} className="w-full sm:w-auto">
-                    <LogOut className="mr-2 h-4 w-4" /> Logout
-                  </Button>
+                  {/* Removed Logout Button */}
              </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
