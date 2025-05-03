@@ -21,10 +21,13 @@ export default function LoginPage() {
 
    // Redirect if already logged in (Client-side check)
    useEffect(() => {
-    console.log("LoginPage useEffect: Checking login status. isLoggedIn:", isLoggedIn);
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] LoginPage useEffect: Checking login status. isLoggedIn: ${isLoggedIn}`);
     if (isLoggedIn) {
-      console.log("LoginPage useEffect: Already logged in, attempting redirect to /invoices");
+      console.log(`[${timestamp}] LoginPage useEffect: isLoggedIn is true. Calling router.replace('/invoices')`);
       router.replace('/invoices'); // Use replace to avoid login page in history
+    } else {
+        console.log(`[${timestamp}] LoginPage useEffect: isLoggedIn is false. No redirect.`);
     }
    }, [isLoggedIn, router]);
 
@@ -32,14 +35,15 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("LoginPage handleSubmit: Attempting login...");
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] LoginPage handleSubmit: Attempting login...`);
 
     try {
         // Attempt login using the context function
         const success = await login(username, password);
 
         if (success) {
-            console.log("LoginPage handleSubmit: Login successful.");
+            console.log(`[${timestamp}] LoginPage handleSubmit: Login successful. isLoggedIn state should update soon.`);
             toast({
                 title: 'Login Successful',
                 description: 'Redirecting to dashboard...',
@@ -47,7 +51,7 @@ export default function LoginPage() {
             // The useEffect hook above will now handle the redirect when isLoggedIn updates
             // No need to set isLoading false here, as the page navigates away or useEffect handles redirect
         } else {
-             console.log("LoginPage handleSubmit: Login failed (invalid credentials).");
+             console.log(`[${timestamp}] LoginPage handleSubmit: Login failed (invalid credentials).`);
              toast({
                 title: 'Login Failed',
                 description: 'Invalid username or password.',
@@ -56,7 +60,7 @@ export default function LoginPage() {
             setIsLoading(false); // Stop loading on failure
         }
     } catch (error) {
-        console.error('Login error:', error);
+        console.error(`[${timestamp}] Login error:`, error);
         toast({
             title: 'Login Error',
             description: 'An unexpected error occurred. Please try again.',
@@ -71,11 +75,13 @@ export default function LoginPage() {
 
    // If redirecting via useEffect, show loading indicator
    if (isLoggedIn) {
-      console.log("LoginPage: Rendering loading spinner because isLoggedIn is true (while redirecting).")
+       const timestamp = new Date().toISOString();
+      console.log(`[${timestamp}] LoginPage: Rendering loading spinner because isLoggedIn is true (while redirecting).`)
       return <main className="flex min-h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></main>; // Or null
    }
 
-   console.log("LoginPage: Rendering login form.");
+   const renderTimestamp = new Date().toISOString();
+   console.log(`[${renderTimestamp}] LoginPage: Rendering login form. isLoggedIn is currently ${isLoggedIn}.`);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 md:p-12 lg:p-24 bg-background">
