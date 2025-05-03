@@ -1,4 +1,3 @@
-
 'use client'; // Keep as client component due to state management for invoices, filters, loading, and errors
 
 import { useState, useEffect } from 'react';
@@ -11,6 +10,7 @@ import { InvoiceFilters } from '@/components/invoice-filters';
 import { Separator } from '@/components/ui/separator';
 import { InvoiceViewSwitcher } from '@/components/invoice-view-switcher';
 import { useSearchParams } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for loading
 
 // Define the structure of the invoice object expected from the API
 export interface Invoice extends InvoiceFormData {
@@ -30,9 +30,7 @@ interface FilterParams {
 }
 
 async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || ''; // Ensure fallback
-
-    // Use relative URL directly if base URL isn't strictly necessary or available
+    // Use relative URL directly
     const queryParams = new URLSearchParams();
     if (filters.customerName) queryParams.append('customerName', filters.customerName);
     if (filters.status) queryParams.append('status', filters.status);
@@ -41,8 +39,6 @@ async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
 
     const apiUrl = `/api/invoices?${queryParams.toString()}`; // Use relative URL
     console.log(`Fetching invoices from: ${apiUrl}`);
-
-    // No need to validate relative URL with new URL()
 
     try {
         const response = await fetch(apiUrl, {
@@ -61,10 +57,6 @@ async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
                 errorBody = `HTTP error! status: ${response.status} ${response.statusText || ''}`.trim();
             }
             console.error(`Error fetching invoices: ${response.status} ${response.statusText}`, errorBody);
-             // Check for specific configuration error message
-            if (errorBody.includes("NEXT_PUBLIC_APP_URL")) {
-                throw new Error(errorBody); // Propagate the specific config error
-            }
             throw new Error(errorBody);
         }
 
@@ -77,9 +69,6 @@ async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
         return data.invoices as Invoice[];
     } catch (error) {
         console.error('An error occurred while fetching invoices:', error);
-        if (error instanceof Error && (error.message.includes("NEXT_PUBLIC_APP_URL"))) {
-             throw error; // Re-throw specific config error
-        }
         // Ensure the error message is propagated correctly
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         throw new Error(`Failed to load invoices. Please check the API connection or try again later. Original error: ${errorMessage}`);
@@ -116,18 +105,19 @@ export default function InvoicesPage() {
       };
 
       loadInvoices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams]); // Re-fetch when searchParams change
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
-      <Card className="w-full max-w-7xl shadow-lg">
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b mb-4 p-4 sm:p-6">
-            <CardTitle className="text-xl sm:text-2xl font-bold text-primary">Saved Invoices</CardTitle>
+      <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Rounded Card */}
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b p-4 sm:p-6 bg-card"> {/* Header background */}
+            <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Saved Invoices</CardTitle> {/* Adjusted size/weight */}
 
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                 {/* Changed Link href to "/invoices/new" to point to the invoice creation page */}
                  <Link href="/invoices/new" passHref legacyBehavior>
-                    <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                     {/* Primary button style */}
+                    <Button size="sm" className="w-full sm:w-auto">
                         <PlusCircle className="mr-2 h-4 w-4" /> Create New Bill
                     </Button>
                  </Link>
@@ -146,8 +136,32 @@ export default function InvoicesPage() {
             <Separator className="my-4 sm:my-6" />
 
             {isLoading ? (
-                 // Show a loading indicator while fetching
-                 <div className="text-center py-10 text-muted-foreground">Loading invoices...</div>
+                 // Show a loading indicator (Skeleton) while fetching
+                 <div className="space-y-4">
+                     <div className="flex justify-end mb-4 space-x-2">
+                        <Skeleton className="h-9 w-9 rounded-md" />
+                        <Skeleton className="h-9 w-9 rounded-md" />
+                     </div>
+                     {/* Skeleton for List View */}
+                      <div className="rounded-lg border">
+                          <Skeleton className="h-12 w-full" /> {/* Header */}
+                          <div className="divide-y divide-border">
+                              {[...Array(5)].map((_, i) => (
+                                <Skeleton key={i} className="h-14 w-full" />
+                              ))}
+                          </div>
+                      </div>
+                      {/* Or Skeleton for Grid View (uncomment if needed) */}
+                      {/* <div className="flex gap-4 md:gap-6 overflow-x-auto pb-4">
+                           {[...Array(4)].map((_, i) => (
+                             <div key={i} className="flex flex-col gap-4 flex-shrink-0 w-64 sm:w-72 md:w-80">
+                               <Skeleton className="h-10 w-full" />
+                               <Skeleton className="h-32 w-full" />
+                               <Skeleton className="h-32 w-full" />
+                             </div>
+                           ))}
+                      </div> */}
+                 </div>
              ) : (
                  // Render the View Switcher once data/error state is resolved
                  <InvoiceViewSwitcher invoices={invoices} fetchError={fetchError} />

@@ -1,6 +1,5 @@
-
 import { InvoiceForm } from '@/components/invoice-form';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'; // Added CardDescription
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -41,16 +40,23 @@ export default async function EditInvoicePage({ params }: EditInvoicePageProps) 
   // Render the form with initial data
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
-      <Card className="w-full max-w-4xl shadow-lg">
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 border-b mb-4">
-          <CardTitle className="text-xl sm:text-2xl font-bold text-primary">Edit Invoice #{invoice.invoiceNumber}</CardTitle>
+      {/* Use a Card for consistent container style */}
+      <Card className="w-full max-w-6xl shadow-lg border border-border rounded-xl overflow-hidden">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4 border-b p-4 sm:p-6 bg-card">
+            <div> {/* Group title and description */}
+                <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Edit Invoice</CardTitle>
+                 <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-1">
+                    Update details for Invoice #{invoice.invoiceNumber}
+                 </CardDescription>
+            </div>
           <Link href="/invoices" passHref>
             <Button variant="outline" size="sm" className="w-full sm:w-auto">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Invoices
             </Button>
           </Link>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
+         {/* Remove CardContent padding as InvoiceForm now handles internal padding */}
+        <CardContent className="p-0">
            {/* Ensure the initial data passed to the form is compatible */}
            {/* InvoiceForm expects dates as YYYY-MM-DD strings */}
           <InvoiceForm initialData={invoice} />

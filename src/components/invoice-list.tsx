@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -67,20 +66,23 @@ const formatDate = (dateString: string | undefined | Date): string => {
 export function InvoiceList({ invoices }: InvoiceListProps) {
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-lg border"> {/* Added border and rounded corners */}
       <Table>
-        <TableCaption className="text-xs sm:text-sm">A list of your invoices {invoices.length > 0 ? `(${invoices.length} found)` : ''}.</TableCaption>
+        <TableCaption className="text-xs sm:text-sm py-4"> {/* Added padding to caption */}
+            A list of your invoices {invoices.length > 0 ? `(${invoices.length} found)` : ''}.
+        </TableCaption>
         <TableHeader>
           {/* Adjust table head padding and potentially hide columns on small screens if needed */}
-          <TableRow>
-            <TableHead className="w-[80px] sm:w-[100px] p-2 sm:p-4 text-xs sm:text-sm">Invoice #</TableHead>
-            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm">Customer</TableHead>
-            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm">Invoice Date</TableHead>
-            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm">Due Date</TableHead>
-            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm">Status</TableHead>
-            <TableHead className="text-right p-2 sm:p-4 text-xs sm:text-sm">Total Amount</TableHead>
-            <TableHead className="text-right p-2 sm:p-4 text-xs sm:text-sm">Amount Due</TableHead>
-            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm text-center">Actions</TableHead>
+           {/* Remove top border from header row as table has border */}
+          <TableRow className="border-t-0 hover:bg-transparent">
+            <TableHead className="w-[80px] sm:w-[100px] p-2 sm:p-4 text-xs sm:text-sm text-muted-foreground">Invoice #</TableHead>
+            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm text-muted-foreground">Customer</TableHead>
+            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm text-muted-foreground">Invoice Date</TableHead>
+            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm text-muted-foreground">Due Date</TableHead>
+            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm text-muted-foreground">Status</TableHead>
+            <TableHead className="text-right p-2 sm:p-4 text-xs sm:text-sm text-muted-foreground">Total Amount</TableHead>
+            <TableHead className="text-right p-2 sm:p-4 text-xs sm:text-sm text-muted-foreground">Amount Due</TableHead>
+            <TableHead className="p-2 sm:p-4 text-xs sm:text-sm text-center text-muted-foreground">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -91,7 +93,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
              const totalDue = invoice.totalDue ?? totalAmount - (invoice.paidAmount ?? 0);
 
              return (
-              <TableRow key={invoice._id}>
+              <TableRow key={invoice._id} className="hover:bg-muted/50 cursor-pointer"> {/* Added hover effect and cursor */}
                  {/* Adjust cell padding and font size */}
                 <TableCell className="font-medium p-2 sm:p-4 text-xs sm:text-sm">{invoice.invoiceNumber}</TableCell>
                 <TableCell className="p-2 sm:p-4 text-xs sm:text-sm">{invoice.customerName}</TableCell>
@@ -107,13 +109,13 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                  <TableCell className="text-center p-2 sm:p-4 space-x-1 sm:space-x-2">
                      {/* View Button */}
                       <Link href={`/invoices/${invoice._id}/view`} passHref legacyBehavior>
-                         <Button variant="ghost" size="icon" aria-label="View invoice" className="h-7 w-7 sm:h-8 sm:w-8">
+                         <Button variant="ghost" size="icon" aria-label="View invoice" className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-foreground">
                              <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                          </Button>
                      </Link>
                      {/* Edit Button */}
                      <Link href={`/invoices/${invoice._id}/edit`} passHref legacyBehavior>
-                         <Button variant="ghost" size="icon" aria-label="Edit invoice" className="h-7 w-7 sm:h-8 sm:w-8">
+                         <Button variant="ghost" size="icon" aria-label="Edit invoice" className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-foreground">
                              <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                          </Button>
                      </Link>
