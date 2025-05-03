@@ -3,9 +3,6 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { PlusCircle } from 'lucide-react';
 import type { InvoiceFormData } from '@/components/invoice-form';
 import { InvoiceFilters } from '@/components/invoice-filters';
 import { Separator } from '@/components/ui/separator';
@@ -114,7 +111,7 @@ export default function InvoicesPage() {
       <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Rounded Card */}
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b p-4 sm:p-6 bg-card"> {/* Header background */}
             <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Saved Invoices</CardTitle> {/* Adjusted size/weight */}
-            {/* Moved Create Button to CardContent */}
+            {/* Create Button is now moved inside InvoiceViewSwitcher */}
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
             <InvoiceFilters
@@ -128,14 +125,7 @@ export default function InvoicesPage() {
 
             <Separator className="my-4 sm:my-6" />
 
-             {/* Moved Create Button Here */}
-             <div className="flex justify-start mb-4 sm:mb-6"> {/* Position button before the switcher */}
-                 <Link href="/invoices/new" passHref legacyBehavior>
-                     <Button size="sm" className="w-auto">
-                         <PlusCircle className="mr-2 h-4 w-4" /> Create New Bill
-                     </Button>
-                 </Link>
-             </div>
+             {/* Create Button Removed From Here */}
 
             {isLoading ? (
                  // Show a loading indicator (Skeleton) while fetching
@@ -143,6 +133,7 @@ export default function InvoicesPage() {
                      <div className="flex justify-end mb-4 space-x-2">
                         <Skeleton className="h-9 w-9 rounded-md" />
                         <Skeleton className="h-9 w-9 rounded-md" />
+                        <Skeleton className="h-10 w-[180px] rounded-md" /> {/* Skeleton for create button */}
                      </div>
                      {/* Skeleton for List View */}
                       <div className="rounded-lg border">

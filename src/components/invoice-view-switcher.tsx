@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { List, LayoutGrid } from 'lucide-react';
+import { List, LayoutGrid, PlusCircle } from 'lucide-react'; // Added PlusCircle
 import { InvoiceList } from './invoice-list';
 import { InvoiceGrid } from './invoice-grid'; // Import the new grid component
 import type { Invoice } from '@/app/invoices/page'; // Import the Invoice type
@@ -19,26 +19,35 @@ export function InvoiceViewSwitcher({ invoices, fetchError }: InvoiceViewSwitche
 
   return (
     <div>
-      {/* Adjust button size */}
-      <div className="flex justify-end mb-4">
-        <Button
-          variant={view === 'list' ? 'default' : 'outline'}
-          size="sm" // Use smaller icon button size
-          onClick={() => setView('list')}
-          className="mr-2 h-8 w-8 sm:h-9 sm:w-9" // Explicit size for consistency
-          aria-label="List view"
-        >
-          <List className="h-4 w-4" />
-        </Button>
-        <Button
-          variant={view === 'grid' ? 'default' : 'outline'}
-          size="sm" // Use smaller icon button size
-          onClick={() => setView('grid')}
-          aria-label="Grid view"
-          className="h-8 w-8 sm:h-9 sm:w-9" // Explicit size for consistency
-        >
-          <LayoutGrid className="h-4 w-4" />
-        </Button>
+      <div className="flex justify-between items-center mb-4"> {/* Use justify-between */}
+         {/* Create New Bill Button */}
+         <Link href="/invoices/new" passHref legacyBehavior>
+           <Button size="sm" className="w-auto">
+             <PlusCircle className="mr-2 h-4 w-4" /> Create New Bill
+           </Button>
+         </Link>
+
+         {/* View Toggle Buttons */}
+         <div className="flex items-center"> {/* Group toggle buttons */}
+             <Button
+               variant={view === 'list' ? 'default' : 'outline'}
+               size="sm" // Use smaller icon button size
+               onClick={() => setView('list')}
+               className="mr-2 h-8 w-8 sm:h-9 sm:w-9" // Explicit size for consistency
+               aria-label="List view"
+             >
+               <List className="h-4 w-4" />
+             </Button>
+             <Button
+               variant={view === 'grid' ? 'default' : 'outline'}
+               size="sm" // Use smaller icon button size
+               onClick={() => setView('grid')}
+               aria-label="Grid view"
+               className="h-8 w-8 sm:h-9 sm:w-9" // Explicit size for consistency
+             >
+               <LayoutGrid className="h-4 w-4" />
+             </Button>
+         </div>
       </div>
 
       {/* Conditional rendering based on fetchError */}
