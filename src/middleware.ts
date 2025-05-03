@@ -1,10 +1,10 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PROTECTED_ROUTES = ['/', '/invoices']; // Add other protected routes here, ensure '/' is handled correctly
+const PROTECTED_ROUTES = ['/', '/invoices']; // Ensure '/' is handled correctly if it's protected
 const PUBLIC_ROUTES = ['/login']; // Routes accessible without login
 const LOGIN_URL = '/login';
-const HOME_URL = '/'; // Or your main dashboard route
+const HOME_URL = '/invoices'; // Change default redirect for logged-in users to invoices
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,43 +12,45 @@ export function middleware(request: NextRequest) {
 
   // **IMPORTANT:** This cookie check is for demonstration ONLY.
   // Replace with secure session/token verification in a real application.
-  const isLoggedInCookie = request.cookies.get('app_auth_state'); // Use the same key as AuthContext (though value format differs)
+  const isLoggedInCookie = request.cookies.get('app_auth_state'); // Use the same key as AuthContext
 
   let isAuthenticated = false;
   if (isLoggedInCookie) {
       try {
-          // Middleware cannot access localStorage, so we rely on the cookie.
-          // Here we just check if the cookie exists and has a truthy 'isLoggedIn' property.
-          // In a real app, you'd verify a token from the cookie.
-          const parsedState = JSON.parse(isLoggedInCookie.value); // Assuming cookie stores JSON string like localStorage
+          // Middleware cannot access localStorage, rely on the cookie.
+          // Verify cookie value (e.g., token validation or simple check)
+          const parsedState = JSON.parse(decodeURIComponent(isLoggedInCookie.value)); // Decode URI component
           isAuthenticated = !!parsedState.isLoggedIn;
+           console.log(`Middleware: Auth cookie found. Authenticated: ${isAuthenticated}`);
       } catch (error) {
           console.warn("Middleware: Error parsing auth cookie. Treating as unauthenticated.", error);
           // Clear potentially corrupted cookie? Maybe not needed if HttpOnly.
       }
+  } else {
+     console.log("Middleware: No auth cookie found.");
   }
 
 
-  const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname === '/' || (route !== '/' && pathname.startsWith(route)));
+  const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname === route || (route !== '/' && pathname.startsWith(route)));
   const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route));
 
   // Scenario 1: User is NOT authenticated
   if (!isAuthenticated) {
     // If trying to access a protected route, redirect to login
-    if (isProtectedRoute) {
+    if (isProtectedRoute && pathname !== LOGIN_URL) { // Don't redirect if already on login page
       console.log(`Middleware: Unauthenticated access to protected route ${pathname}. Redirecting to ${LOGIN_URL}.`);
       const loginUrl = new URL(LOGIN_URL, absoluteUrl);
       loginUrl.searchParams.set('redirectedFrom', pathname);
       return NextResponse.redirect(loginUrl);
     }
     // If accessing a public route (like /login) or any other non-protected route, allow access
-    console.log(`Middleware: Unauthenticated access to non-protected route ${pathname}. Allowing.`);
+    console.log(`Middleware: Unauthenticated access to route ${pathname}. Allowing.`);
     return NextResponse.next();
   }
 
   // Scenario 2: User IS authenticated
   if (isAuthenticated) {
-    // If trying to access the login page, redirect to the home/dashboard page
+    // If trying to access the login page, redirect to the main invoices page
     if (isPublicRoute) {
       console.log(`Middleware: Authenticated access to public route ${pathname}. Redirecting to ${HOME_URL}.`);
       return NextResponse.redirect(new URL(HOME_URL, absoluteUrl));
@@ -59,6 +61,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Fallback: Should not be reached if logic is correct, but good practice
+  console.log(`Middleware: Fallback case for pathname ${pathname}. Allowing.`);
   return NextResponse.next();
 }
 
@@ -77,9 +80,4 @@ export const config = {
 };
 
 // NOTE: This middleware uses a simple cookie check for demonstration.
-// Real-world applications should use robust session management (e.g., JWT in HttpOnly cookies)
-// and potentially database lookups to verify authentication status securely in middleware.
-// The client-side AuthContext handles the UI state based on localStorage,
-// while middleware enforces server-side route protection. Ensure cookie logic aligns
-// with how AuthContext sets authentication state if using cookies for both.
-// Using different mechanisms (localStorage client-side, cookie server-side) requires careful synchronization.
+// Real-world applications should use robust session management (e.g., JWT in HttpOnly cookies).

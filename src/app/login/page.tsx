@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Added useEffect
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,11 +19,12 @@ export default function LoginPage() {
   const { toast } = useToast();
   const { login, isLoggedIn } = useAuth(); // Use the login function from context
 
-   // Redirect if already logged in
-   if (isLoggedIn) {
-    router.replace('/'); // Redirect to home page or dashboard
-    return null; // Render nothing while redirecting
-  }
+   // Redirect if already logged in (Client-side check)
+   useEffect(() => {
+    if (isLoggedIn) {
+      router.replace('/invoices'); // Redirect to invoices page if already logged in
+    }
+   }, [isLoggedIn, router]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,14 +40,15 @@ export default function LoginPage() {
                 title: 'Login Successful',
                 description: 'Welcome back!',
             });
-            router.push('/'); // Redirect to the main page after successful login
+            // Explicitly redirect to the invoices list page
+            router.push('/invoices');
         } else {
              toast({
                 title: 'Login Failed',
                 description: 'Invalid username or password.',
                 variant: 'destructive',
             });
-            setIsLoading(false); // Keep loading state until redirection or failure
+            setIsLoading(false); // Stop loading on failure
         }
     } catch (error) {
         console.error('Login error:', error);
@@ -59,6 +61,12 @@ export default function LoginPage() {
     }
     // No finally block needed as loading state is handled in success/failure paths
   };
+
+   // Return null or a loading indicator while checking auth state or redirecting
+   if (isLoggedIn) {
+      return <div className="flex min-h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>; // Or null
+   }
+
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 md:p-12 lg:p-24 bg-background">
