@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, type ReactNode } from 'react'; // Moved useState and useEffect here
@@ -43,6 +44,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog" // Import Dialog components
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 
 const invoiceItemSchema = z.object({
@@ -647,3 +649,5 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
     </Form>
   );
 }
+
+    
