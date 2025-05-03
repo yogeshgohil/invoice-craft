@@ -33,7 +33,7 @@ export default function LoginPage() {
 
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission which causes page reload
     setIsLoading(true);
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] LoginPage handleSubmit: Attempting login...`);
