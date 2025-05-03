@@ -31,8 +31,7 @@ export default function LoginPage() {
         title: "Login Successful",
         description: "Redirecting to invoices...",
       });
-      // Redirect happens automatically via ProtectedRoute or context effect
-      // router.push('/invoices'); // No longer needed here
+      // Redirect is handled by AuthProvider effect now
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
       toast({

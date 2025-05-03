@@ -38,7 +38,7 @@ export default async function ViewInvoicePage({ params }: ViewInvoicePageProps) 
 
   // Render the invoice preview
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-12 lg:p-24 bg-background print:bg-white print:p-0">
+    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background print:bg-white print:p-0">
       <Card className="w-full max-w-4xl shadow-lg print:shadow-none print:border-none">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 border-b mb-4 print:hidden">
           <CardTitle className="text-xl sm:text-2xl font-bold text-primary">View Invoice #{invoice.invoiceNumber}</CardTitle>

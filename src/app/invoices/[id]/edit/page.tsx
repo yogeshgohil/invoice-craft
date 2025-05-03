@@ -40,7 +40,7 @@ export default async function EditInvoicePage({ params }: EditInvoicePageProps) 
 
   // Render the form with initial data
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-12 lg:p-24 bg-background">
+    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
       <Card className="w-full max-w-4xl shadow-lg">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 border-b mb-4">
           <CardTitle className="text-xl sm:text-2xl font-bold text-primary">Edit Invoice #{invoice.invoiceNumber}</CardTitle>

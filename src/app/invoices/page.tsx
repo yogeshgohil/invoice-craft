@@ -30,13 +30,9 @@ interface FilterParams {
 }
 
 async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || ''; // Ensure fallback
 
-    if (!baseUrl) {
-        console.error("FATAL: NEXT_PUBLIC_APP_URL environment variable is not set.");
-        throw new Error("Application is not configured correctly. NEXT_PUBLIC_APP_URL environment variable is missing. Please set it in your .env.local file (e.g., NEXT_PUBLIC_APP_URL=http://localhost:9002) or deployment environment.");
-    }
-
+    // Use relative URL directly if base URL isn't strictly necessary or available
     const queryParams = new URLSearchParams();
     if (filters.customerName) queryParams.append('customerName', filters.customerName);
     if (filters.status) queryParams.append('status', filters.status);
@@ -65,6 +61,10 @@ async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
                 errorBody = `HTTP error! status: ${response.status} ${response.statusText || ''}`.trim();
             }
             console.error(`Error fetching invoices: ${response.status} ${response.statusText}`, errorBody);
+             // Check for specific configuration error message
+            if (errorBody.includes("NEXT_PUBLIC_APP_URL")) {
+                throw new Error(errorBody); // Propagate the specific config error
+            }
             throw new Error(errorBody);
         }
 
@@ -77,8 +77,8 @@ async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
         return data.invoices as Invoice[];
     } catch (error) {
         console.error('An error occurred while fetching invoices:', error);
-        if (error instanceof Error && (error.message.startsWith("Application is not configured correctly") || error.message.startsWith("Failed to construct valid API URL"))) {
-             throw error;
+        if (error instanceof Error && (error.message.includes("NEXT_PUBLIC_APP_URL"))) {
+             throw error; // Re-throw specific config error
         }
         // Ensure the error message is propagated correctly
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -119,7 +119,7 @@ export default function InvoicesPage() {
     }, [searchParams]); // Re-fetch when searchParams change
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-12 lg:p-24 bg-background">
+    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
       <Card className="w-full max-w-7xl shadow-lg">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b mb-4 p-4 sm:p-6">
             <CardTitle className="text-xl sm:text-2xl font-bold text-primary">Saved Invoices</CardTitle>
