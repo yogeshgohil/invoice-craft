@@ -1,5 +1,5 @@
 
-'use client'; // Keep as client component due to state management for invoices, filters, loading, and errors
+'use client'; // Convert to Client Component
 
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -9,8 +9,10 @@ import { Separator } from '@/components/ui/separator';
 import { InvoiceViewSwitcher } from '@/components/invoice-view-switcher';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton for loading
+import { fetchInvoices } from '@/lib/fetch-invoices'; // Import fetch function
 
 // Define the structure of the invoice object expected from the API
+// Keep this export if other components rely on it
 export interface Invoice extends InvoiceFormData {
   _id: string;
   createdAt?: string;
@@ -25,52 +27,6 @@ interface FilterParams {
     status?: string;
     dueDateStart?: string;
     dueDateEnd?: string;
-}
-
-async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
-    // Use relative URL directly
-    const queryParams = new URLSearchParams();
-    if (filters.customerName) queryParams.append('customerName', filters.customerName);
-    if (filters.status) queryParams.append('status', filters.status);
-    if (filters.dueDateStart) queryParams.append('dueDateStart', filters.dueDateStart);
-    if (filters.dueDateEnd) queryParams.append('dueDateEnd', filters.dueDateEnd);
-
-    const apiUrl = `/api/invoices?${queryParams.toString()}`; // Use relative URL
-    console.log(`Fetching invoices from: ${apiUrl}`);
-
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            cache: 'no-store',
-        });
-
-        if (!response.ok) {
-            let errorBody = 'Failed to fetch invoices.';
-            try {
-                const errorData = await response.json();
-                errorBody = errorData.message || `HTTP error! status: ${response.status}`;
-            } catch (e) {
-                console.error("Could not parse error response body:", e);
-                errorBody = `HTTP error! status: ${response.status} ${response.statusText || ''}`.trim();
-            }
-            console.error(`Error fetching invoices: ${response.status} ${response.statusText}`, errorBody);
-            throw new Error(errorBody);
-        }
-
-        const data = await response.json();
-        if (!data || !Array.isArray(data.invoices)) {
-            console.error('Invalid data structure received from API:', data);
-            throw new Error('Invalid data structure received from API.');
-        }
-        console.log(`Successfully fetched ${data.invoices.length} invoices.`);
-        return data.invoices as Invoice[];
-    } catch (error) {
-        console.error('An error occurred while fetching invoices:', error);
-        // Ensure the error message is propagated correctly
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        throw new Error(`Failed to load invoices. Please check the API connection or try again later. Original error: ${errorMessage}`);
-    }
 }
 
 export default function InvoicesPage() {
@@ -103,14 +59,15 @@ export default function InvoicesPage() {
       };
 
       loadInvoices();
+    // Re-fetch when searchParams change (dependency array includes searchParams)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchParams]); // Re-fetch when searchParams change
+    }, [searchParams]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
-      <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Rounded Card */}
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b p-4 sm:p-6 bg-card"> {/* Header background */}
-            <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Invoice</CardTitle> {/* Adjusted size/weight */}
+      <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b p-4 sm:p-6 bg-card">
+            <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Invoice</CardTitle>
             {/* Create Button is now moved inside InvoiceViewSwitcher */}
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
@@ -125,35 +82,28 @@ export default function InvoicesPage() {
 
             <Separator className="my-4 sm:my-6" />
 
-             {/* Create Button Removed From Here */}
-
             {isLoading ? (
                  // Show a loading indicator (Skeleton) while fetching
                  <div className="space-y-4">
-                     <div className="flex justify-end mb-4 space-x-2">
-                        <Skeleton className="h-9 w-9 rounded-md" />
-                        <Skeleton className="h-9 w-9 rounded-md" />
-                        <Skeleton className="h-10 w-[180px] rounded-md" /> {/* Skeleton for create button */}
+                     <div className="flex justify-between items-center mb-4 space-x-2"> {/* Adjusted layout */}
+                        {/* Skeleton for create button */}
+                        <Skeleton className="h-9 w-[180px] rounded-md" />
+                        {/* Skeletons for view toggle buttons */}
+                         <div className='flex items-center space-x-2'>
+                           <Skeleton className="h-9 w-9 rounded-md" />
+                           <Skeleton className="h-9 w-9 rounded-md" />
+                         </div>
                      </div>
                      {/* Skeleton for List View */}
                       <div className="rounded-lg border">
-                          <Skeleton className="h-12 w-full" /> {/* Header */}
+                          <Skeleton className="h-12 w-full rounded-t-md" /> {/* Header */}
                           <div className="divide-y divide-border">
                               {[...Array(5)].map((_, i) => (
                                 <Skeleton key={i} className="h-14 w-full" />
                               ))}
                           </div>
+                          <Skeleton className="h-10 w-full rounded-b-md"/> {/* Footer/Caption */}
                       </div>
-                      {/* Or Skeleton for Grid View (uncomment if needed) */}
-                      {/* <div className="flex gap-4 md:gap-6 overflow-x-auto pb-4">
-                           {[...Array(4)].map((_, i) => (
-                             <div key={i} className="flex flex-col gap-4 flex-shrink-0 w-64 sm:w-72 md:w-80">
-                               <Skeleton className="h-10 w-full" />
-                               <Skeleton className="h-32 w-full" />
-                               <Skeleton className="h-32 w-full" />
-                             </div>
-                           ))}
-                      </div> */}
                  </div>
              ) : (
                  // Render the View Switcher once data/error state is resolved
@@ -165,4 +115,3 @@ export default function InvoicesPage() {
     </main>
   );
 }
-

@@ -1,3 +1,6 @@
+
+'use client'; // Add 'use client' because InvoiceForm is a client component
+
 import { InvoiceForm } from '@/components/invoice-form';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'; // Added CardDescription
 import { Button } from '@/components/ui/button';
