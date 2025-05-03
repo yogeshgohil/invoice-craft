@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react'; // Added useEffect
+import { useState, useEffect } from 'react'; // Keep useEffect for potential future use, but disable the redirect part
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,32 +17,41 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const { login, isLoggedIn } = useAuth(); // Use the login function from context
+  const { login, isLoggedIn } = useAuth(); // Use the login function and isLoggedIn state from context
 
-   // Redirect if already logged in (Client-side check)
-   useEffect(() => {
-    if (isLoggedIn) {
-      router.replace('/invoices'); // Redirect to invoices page if already logged in
-    }
-   }, [isLoggedIn, router]);
+   // // Redirect if already logged in (Client-side check) - Temporarily disabled to rely on submit handler redirect
+   // useEffect(() => {
+   //  console.log("LoginPage useEffect: Checking login status. isLoggedIn:", isLoggedIn);
+   //  if (isLoggedIn) {
+   //    console.log("LoginPage useEffect: Already logged in, attempting redirect to /invoices");
+   //    router.replace('/invoices'); // Use replace to avoid login page in history
+   //  }
+   // }, [isLoggedIn, router]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log("LoginPage handleSubmit: Attempting login...");
 
     try {
         // Attempt login using the context function
         const success = await login(username, password);
 
         if (success) {
+            console.log("LoginPage handleSubmit: Login successful.");
             toast({
                 title: 'Login Successful',
-                description: 'Welcome back!',
+                description: 'Redirecting to dashboard...', // Updated description
             });
-            // Explicitly redirect to the invoices list page
+            // Explicitly redirect to the invoices list page *after* state update and toast
+            // Using router.push instead of replace here to allow back navigation if needed,
+            // though replace might be better UX to prevent going back to login.
+            console.log("LoginPage handleSubmit: Redirecting to /invoices...");
             router.push('/invoices');
+            // No need to set isLoading false here, as the page navigates away
         } else {
+             console.log("LoginPage handleSubmit: Login failed (invalid credentials).");
              toast({
                 title: 'Login Failed',
                 description: 'Invalid username or password.',
@@ -59,14 +68,15 @@ export default function LoginPage() {
         });
          setIsLoading(false);
     }
-    // No finally block needed as loading state is handled in success/failure paths
   };
 
-   // Return null or a loading indicator while checking auth state or redirecting
-   if (isLoggedIn) {
-      return <div className="flex min-h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>; // Or null
-   }
-
+   // Return null or a loading indicator while checking auth state (if re-enabled useEffect) or during initial render
+   // If useEffect redirect is disabled, this might not be strictly necessary unless there's initial loading
+   // if (isLoggedIn) {
+   //    console.log("LoginPage: Rendering loading spinner because isLoggedIn is true (while redirecting).")
+   //    return <div className="flex min-h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>; // Or null
+   // }
+   console.log("LoginPage: Rendering login form.");
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 md:p-12 lg:p-24 bg-background">
@@ -118,3 +128,4 @@ export default function LoginPage() {
     </main>
   );
 }
+
