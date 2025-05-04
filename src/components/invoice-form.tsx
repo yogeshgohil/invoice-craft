@@ -399,13 +399,13 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
   // Render skeleton or minimal UI if not client-side yet (important for date fields)
    if (!isClient) {
        return (
-           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6"> {/* Use smaller padding on mobile */}
+           <div className="space-y-4 sm:space-y-6 p-4"> {/* Use smaller padding on mobile */}
                {/* Placeholder cards */}
-               <Card className="bg-card animate-pulse"><CardHeader className="p-4 sm:p-6"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 sm:p-6 pt-0 space-y-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-20 bg-muted rounded" /></CardContent></Card>
-               <Card className="bg-card animate-pulse"><CardHeader className="p-4 sm:p-6"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 sm:p-6 pt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /></CardContent></Card>
-               <Card className="bg-card animate-pulse"><CardHeader className="p-4 sm:p-6"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 sm:p-6 pt-0 space-y-4"><Skeleton className="h-20 bg-muted rounded" /><Skeleton className="h-10 w-32 bg-muted rounded" /></CardContent></Card>
+               <Card className="bg-card animate-pulse"><CardHeader className="p-4"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 pt-0 space-y-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-20 bg-muted rounded" /></CardContent></Card>
+               <Card className="bg-card animate-pulse"><CardHeader className="p-4"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 pt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /></CardContent></Card>
+               <Card className="bg-card animate-pulse"><CardHeader className="p-4"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 pt-0 space-y-4"><Skeleton className="h-20 bg-muted rounded" /><Skeleton className="h-10 w-32 bg-muted rounded" /></CardContent></Card>
                {/* Add more placeholders as needed */}
-                <CardFooter className="flex flex-col gap-2 pt-6 px-4 sm:px-6"> {/* Stack buttons vertically */}
+                <CardFooter className="flex flex-col gap-2 pt-6 px-4"> {/* Stack buttons vertically */}
                     <Skeleton className="h-9 w-full bg-muted rounded-md" />
                     <Skeleton className="h-9 w-full bg-muted rounded-md" />
                     <Skeleton className="h-9 w-full bg-muted rounded-md" />
@@ -418,112 +418,102 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
   return (
     <Form {...form}>
         {/* Use a single column layout for mobile, adjust gaps */}
-        <form className="grid grid-cols-1 gap-4 sm:gap-6 p-4"> {/* Reduced padding for mobile */}
+        {/* Reduce overall padding for the form container on smaller screens */}
+        <form className="grid grid-cols-1 gap-4 p-2 sm:p-4">
             {/* Main Content Area */}
-            <div className="space-y-4 sm:space-y-6">
+            {/* Reduce spacing between cards on smaller screens */}
+            <div className="space-y-4">
 
                 {/* Customer Information Card */}
+                {/* Reduce padding within cards */}
                 <Card className="bg-card shadow-sm border border-border">
-                    <CardHeader className="p-4 border-b"> {/* Reduced padding */}
-                        <CardTitle className="text-base">Customer Information</CardTitle>
-                        <CardDescription className="text-xs">Details of the person or company being billed.</CardDescription>
+                    <CardHeader className="p-3 sm:p-4 border-b">
+                        <CardTitle className="text-base sm:text-lg">Customer Information</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">Details of the person or company being billed.</CardDescription>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-1 gap-4 p-4"> {/* Reduced padding */}
+                    <CardContent className="grid grid-cols-1 gap-3 p-3 sm:p-4"> {/* Reduced gap */}
                         <FormField control={form.control} name="customerName" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Customer Name</FormLabel>
-                                <FormControl><Input placeholder="Ravina" {...field} /></FormControl>
-                                <FormMessage />
+                                <FormLabel className="text-xs sm:text-sm">Customer Name</FormLabel>
+                                <FormControl><Input placeholder="Ravina" {...field} className="h-9 sm:h-10 text-xs sm:text-sm" /></FormControl> {/* Adjust input size */}
+                                <FormMessage className="text-xs" />
                             </FormItem>
                         )} />
                         <FormField control={form.control} name="customerEmail" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Customer Email (Optional)</FormLabel>
-                                <FormControl><Input type="email" placeholder="john.doe@example.com" {...field} /></FormControl>
-                                <FormMessage />
+                                <FormLabel className="text-xs sm:text-sm">Customer Email (Optional)</FormLabel>
+                                <FormControl><Input type="email" placeholder="john.doe@example.com" {...field} className="h-9 sm:h-10 text-xs sm:text-sm" /></FormControl>
+                                <FormMessage className="text-xs" />
                             </FormItem>
                         )} />
                         <FormField control={form.control} name="customerAddress" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Customer Address (Optional)</FormLabel>
-                                <FormControl><Textarea placeholder="123 Main St, Anytown, USA 12345" {...field} rows={3} /></FormControl>
-                                <FormMessage />
+                                <FormLabel className="text-xs sm:text-sm">Customer Address (Optional)</FormLabel>
+                                <FormControl><Textarea placeholder="123 Main St, Anytown, USA 12345" {...field} rows={2} className="text-xs sm:text-sm" /></FormControl> {/* Fewer rows */}
+                                <FormMessage className="text-xs" />
                             </FormItem>
                         )} />
                     </CardContent>
                 </Card>
 
-                 {/* Invoice Details Card (Merged with Payment/Summary for mobile simplicity) */}
-                 {/* <Card className="bg-card shadow-sm border border-border">
-                     <CardHeader className="p-4 border-b">
-                        <CardTitle className="text-base">Invoice Details</CardTitle>
-                         <CardDescription className="text-xs">Core invoice identification and dates.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-1 gap-4 p-4">
-                      {/* Details Fields Here *}
-                    </CardContent>
-                 </Card> */}
 
                 {/* Invoice Items Card */}
                 <Card className="bg-card shadow-sm border border-border">
-                    <CardHeader className="p-4 border-b"> {/* Reduced padding */}
-                        <CardTitle className="text-base">Invoice Items</CardTitle>
-                        <CardDescription className="text-xs">Add the services or products being billed.</CardDescription>
+                    <CardHeader className="p-3 sm:p-4 border-b">
+                        <CardTitle className="text-base sm:text-lg">Invoice Items</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">Add the services or products being billed.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-3 p-4"> {/* Reduced padding and gap */}
+                    <CardContent className="space-y-2 p-3 sm:p-4"> {/* Reduced gap/padding */}
                         {fields.map((field, index) => (
-                            <div key={field.id} className="flex flex-col gap-2 rounded-md border p-3 bg-secondary/30"> {/* Simpler vertical layout */}
+                            <div key={field.id} className="flex flex-col gap-2 rounded-md border p-2 sm:p-3 bg-secondary/30"> {/* Reduced padding */}
                                 <FormField control={form.control} name={`items.${index}.description`} render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-xs sr-only">Description</FormLabel>
-                                        <FormControl><Input placeholder="Service or Product" {...field} /></FormControl>
-                                        <FormMessage />
+                                        <FormControl><Input placeholder="Service or Product" {...field} className="h-8 sm:h-9 text-xs sm:text-sm" /></FormControl> {/* Smaller input */}
+                                        <FormMessage className="text-xs" />
                                     </FormItem>
                                 )} />
-                                <div className="grid grid-cols-3 gap-2 items-end"> {/* Grid for qty, price, color, remove */}
+                                <div className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center"> {/* Adjust grid columns for better alignment */}
                                     <FormField control={form.control} name={`items.${index}.quantity`} render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-xs sr-only">Quantity</FormLabel>
-                                            <FormControl><Input type="number" placeholder="Qty" {...field} /></FormControl>
-                                            <FormMessage />
+                                            <FormControl><Input type="number" placeholder="Qty" {...field} className="h-8 sm:h-9 text-xs sm:text-sm" /></FormControl>
+                                            <FormMessage className="text-xs" />
                                         </FormItem>
                                     )} />
                                     <FormField control={form.control} name={`items.${index}.price`} render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-xs sr-only">Price (₹)</FormLabel>
-                                            <FormControl><Input type="number" step="0.01" placeholder="Price (₹)" {...field} /></FormControl>
-                                            <FormMessage />
+                                            <FormControl><Input type="number" step="0.01" placeholder="Price (₹)" {...field} className="h-8 sm:h-9 text-xs sm:text-sm" /></FormControl>
+                                            <FormMessage className="text-xs" />
                                         </FormItem>
                                     )} />
                                      <div className='flex items-center gap-1 justify-end'>
-                                         {/* Color Picker */}
                                         <FormField control={form.control} name={`items.${index}.color`} render={({ field }) => (
                                             <FormItem className="flex flex-col items-start">
                                                 <FormLabel className="text-xs sr-only">Color</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         type="color"
-                                                        className="h-8 w-10 p-1 border rounded cursor-pointer" // Basic styling for color input
+                                                        className="h-7 w-8 p-0.5 sm:h-8 sm:w-10 border rounded cursor-pointer" // Smaller color input
                                                         {...field}
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+                                                <FormMessage className="text-xs" />
                                             </FormItem>
                                         )} />
-                                         {/* Remove Button */}
-                                        <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove item" disabled={fields.length <= 1} className="w-7 h-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive self-center">
-                                            <Trash2 className="h-3.5 w-3.5" /> {/* Smaller icon */}
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove item" disabled={fields.length <= 1} className="w-6 h-6 sm:w-7 sm:w-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive self-center"> {/* Smaller button */}
+                                            <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                         </Button>
                                      </div>
                                 </div>
                             </div>
                         ))}
-                        {/* Display root array error */}
-                        {form.formState.errors.items?.root && (<p className="text-sm text-destructive">{form.formState.errors.items.root.message}</p>)}
-                        {form.formState.errors.items && !form.formState.errors.items.root && typeof form.formState.errors.items === 'object' && 'message' in form.formState.errors.items && (<p className="text-sm text-destructive">{form.formState.errors.items.message}</p>)}
+                        {form.formState.errors.items?.root && (<p className="text-xs text-destructive">{form.formState.errors.items.root.message}</p>)}
+                        {form.formState.errors.items && !form.formState.errors.items.root && typeof form.formState.errors.items === 'object' && 'message' in form.formState.errors.items && (<p className="text-xs text-destructive">{form.formState.errors.items.message}</p>)}
 
-                        <Button type="button" variant="outline" size="sm" onClick={() => append({ description: '', quantity: 1, price: 0, color: '#000000' })} className="w-full border-dashed"> {/* Full width button */}
-                            <PlusCircle className="mr-2 h-4 w-4" /> Add Item
+                        <Button type="button" variant="outline" size="sm" onClick={() => append({ description: '', quantity: 1, price: 0, color: '#000000' })} className="w-full border-dashed text-xs sm:text-sm"> {/* Adjusted size */}
+                            <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Add Item
                         </Button>
                     </CardContent>
                 </Card>
@@ -531,15 +521,15 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
 
                 {/* Notes Card */}
                 <Card className="bg-card shadow-sm border border-border">
-                    <CardHeader className="p-4 border-b"> {/* Reduced padding */}
-                        <CardTitle className="text-base">Notes (Optional)</CardTitle>
-                         <CardDescription className="text-xs">Add any additional terms or instructions.</CardDescription>
+                    <CardHeader className="p-3 sm:p-4 border-b">
+                        <CardTitle className="text-base sm:text-lg">Notes (Optional)</CardTitle>
+                         <CardDescription className="text-xs sm:text-sm">Add any additional terms or instructions.</CardDescription>
                     </CardHeader>
-                    <CardContent className="p-4"> {/* Reduced padding */}
+                    <CardContent className="p-3 sm:p-4">
                         <FormField control={form.control} name="notes" render={({ field }) => (
                             <FormItem>
-                                <FormControl><Textarea placeholder="E.g., Payment due within 30 days." {...field} rows={4} /></FormControl>
-                                <FormMessage />
+                                <FormControl><Textarea placeholder="E.g., Payment due within 30 days." {...field} rows={3} className="text-xs sm:text-sm" /></FormControl> {/* Fewer rows */}
+                                <FormMessage className="text-xs" />
                             </FormItem>
                         )} />
                     </CardContent>
@@ -548,54 +538,54 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
             </div>
 
              {/* Sticky Footer/Summary Area for Mobile */}
-            <div className="sticky bottom-0 bg-background border-t border-border pt-3 pb-2 px-4 -mx-4 space-y-4"> {/* Make footer sticky */}
-                 {/* Invoice Details Fields - Moved here for mobile */}
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <div className="sticky bottom-0 bg-background border-t border-border pt-3 pb-2 px-2 sm:px-4 -mx-2 sm:-mx-4 space-y-3"> {/* Reduced horizontal padding */}
+                 {/* Invoice Details Fields */}
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-2 sm:gap-x-4 sm:gap-y-3"> {/* Reduced gap */}
                         <FormField control={form.control} name="invoiceNumber" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Invoice Number</FormLabel>
-                                <FormControl><Input {...field} disabled={isEditMode} className={cn(isEditMode && "cursor-not-allowed bg-muted/50", "h-9")} /></FormControl> {/* Smaller height */}
-                                <FormMessage />
+                                <FormLabel className="text-xs sm:text-sm">Invoice Number</FormLabel>
+                                <FormControl><Input {...field} disabled={isEditMode} className={cn(isEditMode && "cursor-not-allowed bg-muted/50", "h-8 sm:h-9 text-xs sm:text-sm")} /></FormControl> {/* Smaller height */}
+                                <FormMessage className="text-xs" />
                             </FormItem>
                         )} />
                          <FormField control={form.control} name="status" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Status</FormLabel>
+                                <FormLabel className="text-xs sm:text-sm">Status</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                                    <FormControl><SelectTrigger className='h-9'><SelectValue placeholder="Select status" /></SelectTrigger></FormControl> {/* Smaller height */}
+                                    <FormControl><SelectTrigger className='h-8 sm:h-9 text-xs sm:text-sm'><SelectValue placeholder="Select status" /></SelectTrigger></FormControl> {/* Smaller height */}
                                     <SelectContent>
-                                        {statusEnum.options.map((status) => ( <SelectItem key={status} value={status}>{status}</SelectItem> ))}
+                                        {statusEnum.options.map((status) => ( <SelectItem key={status} value={status} className="text-xs sm:text-sm">{status}</SelectItem> ))}
                                     </SelectContent>
                                 </Select>
-                                <FormMessage />
+                                <FormMessage className="text-xs" />
                             </FormItem>
                         )} />
                         <FormField control={form.control} name="invoiceDate" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Invoice Date</FormLabel>
-                                <FormControl><Input type="date" {...field} className='h-9'/></FormControl> {/* Smaller height */}
-                                <FormMessage />
+                                <FormLabel className="text-xs sm:text-sm">Invoice Date</FormLabel>
+                                <FormControl><Input type="date" {...field} className='h-8 sm:h-9 text-xs sm:text-sm'/></FormControl> {/* Smaller height */}
+                                <FormMessage className="text-xs" />
                             </FormItem>
                         )} />
                         <FormField control={form.control} name="dueDate" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Due Date</FormLabel>
-                                <FormControl><Input type="date" {...field} className='h-9'/></FormControl> {/* Smaller height */}
-                                <FormMessage />
+                                <FormLabel className="text-xs sm:text-sm">Due Date</FormLabel>
+                                <FormControl><Input type="date" {...field} className='h-8 sm:h-9 text-xs sm:text-sm'/></FormControl> {/* Smaller height */}
+                                <FormMessage className="text-xs" />
                             </FormItem>
                         )} />
 
                         <FormField control={form.control} name="paidAmount" render={({ field }) => (
-                            <FormItem className='col-span-2'> {/* Span across both columns */}
-                                <FormLabel>Amount Paid (₹)</FormLabel>
-                                <FormControl><Input type="number" step="0.01" placeholder="0.00" {...field} className='h-9'/></FormControl> {/* Smaller height */}
-                                <FormMessage />
+                            <FormItem className='col-span-2'>
+                                <FormLabel className="text-xs sm:text-sm">Amount Paid (₹)</FormLabel>
+                                <FormControl><Input type="number" step="0.01" placeholder="0.00" {...field} className='h-8 sm:h-9 text-xs sm:text-sm'/></FormControl> {/* Smaller height */}
+                                <FormMessage className="text-xs" />
                             </FormItem>
                         )} />
                     </div>
 
                  {/* Summary Section */}
-                 <div className="space-y-1 text-sm border-t pt-3">
+                 <div className="space-y-0.5 text-xs sm:text-sm border-t pt-2 sm:pt-3"> {/* Reduced padding/spacing */}
                      <div className="flex justify-between">
                         <span className="text-muted-foreground">Total Amount:</span>
                         <span className="font-medium">{formatCurrency(totalAmount)}</span>
@@ -604,58 +594,57 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
                         <span className="text-muted-foreground">Amount Paid:</span>
                         <span className="font-medium">{formatCurrency(watchedPaidAmount || 0)}</span>
                      </div>
-                     <Separator className="my-1" />
-                     <div className="flex justify-between text-base font-semibold">
+                     <Separator className="my-0.5 sm:my-1" /> {/* Reduced margin */}
+                     <div className="flex justify-between text-sm sm:text-base font-semibold"> {/* Adjusted font size */}
                         <span>Total Due:</span>
                         <span>{formatCurrency(totalDue)}</span>
                      </div>
                  </div>
 
                  {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-2 pt-3 sm:flex sm:flex-wrap sm:justify-end sm:gap-3">
+                  <div className="grid grid-cols-2 gap-2 pt-2 sm:pt-3"> {/* Always 2 columns, adjust gap */}
                         <Dialog>
                              <DialogTrigger asChild>
-                                 <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto" onClick={handlePreviewData}>
-                                     <Eye className="mr-2 h-4 w-4" /> Preview
+                                 {/* Adjusted button size */}
+                                 <Button type="button" variant="outline" size="sm" className="w-full h-9 text-xs sm:text-sm" onClick={handlePreviewData}>
+                                     <Eye className="mr-1.5 h-3.5 w-3.5" /> Preview
                                  </Button>
                              </DialogTrigger>
-                             <DialogContent className="max-w-4xl w-[95vw] h-[85vh] p-0 flex flex-col"> {/* Adjusted width/height for mobile */}
+                             <DialogContent className="max-w-4xl w-[95vw] h-[85vh] p-0 flex flex-col">
                                  <DialogHeader className="p-4 border-b">
-                                     <DialogTitle>Invoice Preview</DialogTitle>
+                                     <DialogTitle className="text-base sm:text-lg">Invoice Preview</DialogTitle>
                                  </DialogHeader>
-                                 <div className="flex-grow overflow-auto p-4 bg-muted/20">
+                                 <div className="flex-grow overflow-auto p-2 sm:p-4 bg-muted/20"> {/* Reduced padding */}
                                      {invoiceData ? (
                                          <InvoicePreview data={{
                                             ...invoiceData,
-                                            // Pass calculated values explicitly to preview
                                             totalAmount: totalAmount,
                                             totalDue: totalDue,
-                                            // Ensure dates are in string format if needed by preview
                                             invoiceDate: typeof invoiceData.invoiceDate === 'string' ? invoiceData.invoiceDate : format(invoiceData.invoiceDate, 'yyyy-MM-dd'),
                                             dueDate: typeof invoiceData.dueDate === 'string' ? invoiceData.dueDate : format(invoiceData.dueDate, 'yyyy-MM-dd')
                                         }} />
                                      ) : (
-                                         <div className="flex items-center justify-center h-full text-muted-foreground">
+                                         <div className="flex items-center justify-center h-full text-muted-foreground text-xs sm:text-sm">
                                              Update form to see preview.
                                          </div>
                                      )}
                                  </div>
-                                <DialogFooter className="p-3 border-t flex-col sm:flex-row gap-2"> {/* Adjusted padding and gap */}
-                                    <Button type="button" variant="secondary" size="sm" onClick={downloadPDF} disabled={!invoiceData || isSaving} className='w-full sm:w-auto'>
-                                         <Download className="mr-2 h-4 w-4" /> Download PDF
+                                <DialogFooter className="p-3 border-t flex-col sm:flex-row gap-2">
+                                    <Button type="button" variant="secondary" size="sm" onClick={downloadPDF} disabled={!invoiceData || isSaving} className='w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9'>
+                                         <Download className="mr-1.5 h-3.5 w-3.5" /> Download
                                     </Button>
                                     <DialogClose asChild>
-                                         <Button type="button" variant="outline" size="sm" className='w-full sm:w-auto'>Close</Button>
+                                         <Button type="button" variant="outline" size="sm" className='w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9'>Close</Button>
                                     </DialogClose>
                                 </DialogFooter>
                              </DialogContent>
                          </Dialog>
 
-                         <Button type="button" variant="outline" size="sm" onClick={() => router.push('/invoices')} className="w-full sm:w-auto">
-                             <Ban className="mr-2 h-4 w-4" /> Cancel
+                         <Button type="button" variant="outline" size="sm" onClick={() => router.push('/invoices')} className="w-full h-9 text-xs sm:text-sm">
+                             <Ban className="mr-1.5 h-3.5 w-3.5" /> Cancel
                          </Button>
-                         <Button type="button" onClick={handleSave} disabled={isSaving} size="sm" className="w-full sm:w-auto col-span-2"> {/* Make save full width on mobile */}
-                             {isSaving ? ( <Loader2 className="mr-2 h-4 w-4 animate-spin" /> ) : ( isEditMode ? <Send className="mr-2 h-4 w-4" /> : <Save className="mr-2 h-4 w-4" /> )}
+                         <Button type="button" onClick={handleSave} disabled={isSaving} size="sm" className="w-full col-span-2 h-9 text-xs sm:text-sm"> {/* Make save full width */}
+                             {isSaving ? ( <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> ) : ( isEditMode ? <Send className="mr-1.5 h-3.5 w-3.5" /> : <Save className="mr-1.5 h-3.5 w-3.5" /> )}
                              {isSaving ? 'Saving...' : (isEditMode ? 'Update Invoice' : 'Save Invoice')}
                          </Button>
                      </div>
@@ -669,13 +658,10 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
              style={{ visibility: 'hidden', position: 'fixed', pointerEvents: 'none' }} // Ensure it's hidden but available
              aria-hidden="true"
          >
-             {/* Render preview only when data is available */}
              {invoiceData && <InvoicePreview data={{
                  ...invoiceData,
-                 // Pass calculated fields to the hidden preview as well
                  totalAmount: totalAmount,
                  totalDue: totalDue,
-                 // Dates should ideally be strings here if InvoicePreview expects them
                  invoiceDate: typeof invoiceData.invoiceDate === 'string' ? invoiceData.invoiceDate : format(invoiceData.invoiceDate, 'yyyy-MM-dd'),
                  dueDate: typeof invoiceData.dueDate === 'string' ? invoiceData.dueDate : format(invoiceData.dueDate, 'yyyy-MM-dd')
             }} />}

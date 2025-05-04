@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
@@ -55,9 +54,9 @@ export function IncomeReportChart({ data }: IncomeReportChartProps) {
 
   return (
      // Parent div now takes full width and a fixed height responsive to screen size
-    <div className="w-full h-[300px] sm:h-[350px]">
+    <div className="w-full h-[250px] sm:h-[300px]"> {/* Adjusted height */}
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} margin={{ top: 5, right: 0, left: -15, bottom: 5 }}> {/* Adjusted margins */}
+        <BarChart data={chartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}> {/* Adjusted margins further */}
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
           <XAxis
             dataKey="name"
@@ -74,21 +73,21 @@ export function IncomeReportChart({ data }: IncomeReportChartProps) {
             tickLine={false}
             axisLine={false}
             tickFormatter={(value) => `${formatCurrency(value / 1000)}k`} // Format as thousands (e.g., 5k)
-            width={55} // Slightly reduced width for mobile
+            width={50} // Slightly reduced width for mobile
              // dx={-5} // Optional: Adjust horizontal position
           />
            <Tooltip
               cursor={{ fill: "hsl(var(--muted))", opacity: 0.5 }} // Use muted for cursor fill
               content={<CustomTooltip />}
            />
-           <Legend verticalAlign="top" height={30} wrapperStyle={{ fontSize: '10px', paddingTop: '5px' }} /> {/* Smaller legend font size */}
+           <Legend verticalAlign="top" height={25} wrapperStyle={{ fontSize: '10px', paddingTop: '0px' }} /> {/* Smaller legend, adjusted padding */}
           <Bar
              dataKey="totalInvoiced"
              name="Total Invoiced"
              fill="hsl(var(--chart-1))" // Use chart color 1
              radius={[3, 3, 0, 0]} // Slightly smaller radius
              stackId="a" // Optional: stack bars if desired, remove if side-by-side needed
-             barSize={15} // Optional: Fixed bar size for consistency
+             barSize={12} // Optional: Fixed bar size for consistency, smaller for mobile
           />
            <Bar
              dataKey="totalPaid"
@@ -96,7 +95,7 @@ export function IncomeReportChart({ data }: IncomeReportChartProps) {
              fill="hsl(var(--chart-2))" // Use chart color 2
              radius={[3, 3, 0, 0]} // Slightly smaller radius
              stackId="a" // Optional: stack bars if desired, remove if side-by-side needed
-             barSize={15} // Optional: Fixed bar size for consistency
+             barSize={12} // Optional: Fixed bar size for consistency, smaller for mobile
           />
            <Bar
              dataKey="totalDue"
@@ -104,12 +103,10 @@ export function IncomeReportChart({ data }: IncomeReportChartProps) {
              fill="hsl(var(--chart-5))" // Use chart color 5 (often red/orange)
              radius={[3, 3, 0, 0]} // Slightly smaller radius
              stackId="a" // Optional: stack bars if desired, remove if side-by-side needed
-             barSize={15} // Optional: Fixed bar size for consistency
+             barSize={12} // Optional: Fixed bar size for consistency, smaller for mobile
            />
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
-
-    

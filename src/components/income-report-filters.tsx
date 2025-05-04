@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -104,7 +103,7 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
    if (!isClient) {
       return (
           // Adjusted skeleton layout for mobile friendliness
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2 sm:gap-3 mb-3"> {/* Reduced bottom margin */}
               <div className="grid gap-1.5 w-full sm:w-auto"> {/* Adjusted gap */}
                  <Skeleton className="h-3.5 w-20" /> {/* Adjusted size */}
                  <Skeleton className="h-8 w-full sm:w-56" /> {/* Adjusted size */}
@@ -120,7 +119,7 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
 
   return (
      // Adjusted layout for mobile friendliness
-     <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2 sm:gap-3 mb-3 sm:mb-4">
+     <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2 sm:gap-3 mb-3"> {/* Reduced bottom margin */}
        <div className="grid gap-1.5 w-full sm:w-auto"> {/* Adjusted gap */}
         <Label htmlFor="date-range-picker" className="text-xs sm:text-sm">Select Date Range</Label> {/* Adjusted size */}
          <Popover>
@@ -199,6 +198,3 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
      </div>
   );
 }
-
-
-    

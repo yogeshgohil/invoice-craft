@@ -30,7 +30,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider defaultOpen={false}> {/* Default to collapsed */}
       {isMobile ? <MobileNav /> : <SidebarNav />} {/* Conditional Rendering */}
-      <SidebarInset> {/* Wrap the main content */}
+      {/* Adjust padding for SidebarInset */}
+      <SidebarInset className="p-2 sm:p-4 md:p-6"> {/* Add responsive padding */}
         {children}
       </SidebarInset>
       <Toaster /> {/* Add Toaster here */}
@@ -52,7 +53,7 @@ export default function RootLayout({
       >
         <AuthProvider> {/* Wrap children with AuthProvider */}
            {/* Wrap LayoutContent in Suspense to handle the initial undefined state of isMobile */}
-           <Suspense fallback={<div>Loading...</div>}>
+           <Suspense fallback={<div>Loading...</div>}> {/* Consider a better fallback/skeleton */}
                <LayoutContent>{children}</LayoutContent> {/* Use the wrapper component */}
            </Suspense>
         </AuthProvider>

@@ -1,4 +1,3 @@
-
 'use client'; // Convert to Client Component
 
 import { useState, useEffect } from 'react';
@@ -58,7 +57,7 @@ export default function ViewInvoicePage(props: ViewInvoicePageProps) {
   // Render loading state
   if (isLoading) {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 md:p-6 bg-background print:bg-white print:p-0"> {/* Reduced padding */}
+        <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background print:bg-white print:p-0"> {/* Reduced padding */}
            <Card className="w-full max-w-4xl shadow-lg print:shadow-none print:border-none">
                 <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 border-b mb-3 print:hidden p-3 sm:p-4"> {/* Reduced padding/margin */}
                    <Skeleton className="h-6 w-40 rounded" /> {/* Adjusted size */}
@@ -140,10 +139,10 @@ export default function ViewInvoicePage(props: ViewInvoicePageProps) {
 
   // Render invoice preview if loaded
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 md:p-6 bg-background print:bg-white print:p-0"> {/* Reduced padding */}
+    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background print:bg-white print:p-0"> {/* Reduced padding */}
       <Card className="w-full max-w-4xl shadow-lg print:shadow-none print:border-none">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 border-b mb-3 print:hidden p-3 sm:p-4"> {/* Reduced padding/margin */}
-          <CardTitle className="text-lg sm:text-xl font-bold text-primary">View Invoice #{invoice?.invoiceNumber || '...'}</CardTitle> {/* Adjusted font size */}
+          <CardTitle className="text-base sm:text-lg font-bold text-primary">View Invoice #{invoice?.invoiceNumber || '...'}</CardTitle> {/* Adjusted font size */}
           {/* Pass invoiceId to actions */}
           {invoice?._id && <InvoiceViewActions invoiceId={invoice._id} />}
         </CardHeader>

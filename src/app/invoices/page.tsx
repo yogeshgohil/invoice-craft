@@ -1,4 +1,3 @@
-
 'use client'; // Convert to Client Component
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -156,7 +155,7 @@ export default function InvoicesPage() {
 
   return (
      // Reduced padding for mobile view
-    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 md:p-6 bg-background">
+    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background">
       <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-1 sm:space-y-0 sm:space-x-4 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
             <CardTitle className="text-base sm:text-lg font-semibold text-foreground">Invoice</CardTitle> {/* Adjusted font size */}
@@ -182,6 +181,7 @@ export default function InvoicesPage() {
                           <div className='flex items-center justify-end sm:justify-start space-x-1.5'>
                             <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
                             <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
+                            <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" /> {/* Added skeleton for create button */}
                           </div>
                       </div>
                      {/* Skeleton for List View */}
@@ -219,6 +219,3 @@ export default function InvoicesPage() {
     </main>
   );
 }
-
-
-    
