@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { List, LayoutGrid, PlusCircle } from 'lucide-react'; // Added PlusCircle
+import { List, LayoutGrid, PlusCircle, LineChart } from 'lucide-react'; // Added PlusCircle & LineChart
 import { InvoiceList } from './invoice-list';
 import { InvoiceGrid } from './invoice-grid'; // Import the new grid component
 import type { Invoice } from '@/app/invoices/page'; // Import the Invoice type
@@ -23,14 +23,21 @@ export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted }: 
        {/* Use flex-col on small screens, adjust spacing */}
        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2"> {/* Adjusted layout, reduced margin */}
           {/* Create Button and View Toggle Group */}
-         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch">
-            {/* Create New Bill Button */}
-            <Link href="/invoices/new" passHref legacyBehavior>
-              <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create New Bill {/* Adjusted icon margin/size */}
-              </Button>
-            </Link>
-         </div>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch"> {/* Group buttons */}
+              {/* Create New Bill Button */}
+              <Link href="/invoices/new" passHref legacyBehavior>
+                  <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                      <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create New Bill {/* Adjusted icon margin/size */}
+                  </Button>
+              </Link>
+              {/* Income Report Button */}
+              <Link href="/reports/income" passHref legacyBehavior>
+                   <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                       <LineChart className="mr-1.5 h-3.5 w-3.5" /> Income Report
+                   </Button>
+              </Link>
+          </div>
+
 
          {/* View Toggle Buttons - Align end */}
          <div className="flex items-center justify-end sm:justify-end"> {/* Align end */}
@@ -91,4 +98,3 @@ export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted }: 
     </div>
   );
 }
-
