@@ -11,7 +11,7 @@ import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from 'lucide-react';
-import { subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { subMonths, startOfMonth, endOfMonth, format as formatDateFns } from 'date-fns'; // Added formatDateFns alias
 
 // Wrapper Component to use useSearchParams
 function IncomeReportContent() {
@@ -20,18 +20,20 @@ function IncomeReportContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Get date range from URL params or set defaults
+    // Get date range from URL params or set defaults to current month
     const defaultEndDate = endOfMonth(new Date());
-    const defaultStartDate = startOfMonth(subMonths(defaultEndDate, 5)); // Default to last 6 months
+    const defaultStartDate = startOfMonth(new Date()); // Default to start of current month
 
-    const startDate = searchParams.get('startDate') || defaultStartDate.toISOString().split('T')[0];
-    const endDate = searchParams.get('endDate') || defaultEndDate.toISOString().split('T')[0];
+    // Use URL params if they exist, otherwise use the calculated defaults
+    const startDate = searchParams.get('startDate') || formatDateFns(defaultStartDate, 'yyyy-MM-dd');
+    const endDate = searchParams.get('endDate') || formatDateFns(defaultEndDate, 'yyyy-MM-dd');
 
     useEffect(() => {
         const loadReportData = async () => {
             setIsLoading(true);
             setError(null);
             try {
+                // Fetch data based on the effective start/end dates (from URL or defaults)
                 const data = await fetchIncomeReport({ startDate, endDate });
                 setReportData(data);
             } catch (err: any) {
@@ -43,7 +45,8 @@ function IncomeReportContent() {
         };
 
         loadReportData();
-    }, [startDate, endDate]); // Refetch when date range changes
+        // Re-fetch data when the relevant search params (startDate, endDate) change
+    }, [startDate, endDate]); // Depend on the derived start/end dates
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 lg:p-12 bg-background">
@@ -55,16 +58,22 @@ function IncomeReportContent() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6 space-y-6">
+                    {/* Pass the effective start/end dates to the filters component */}
                     <IncomeReportFilters initialStartDate={startDate} initialEndDate={endDate} />
 
                     {isLoading ? (
                         <div className="space-y-6">
-                            <Skeleton className="h-10 w-48" />
-                            <Skeleton className="h-72 w-full" />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <Skeleton className="h-24 w-full" />
-                                <Skeleton className="h-24 w-full" />
+                            {/* Keep Skeleton structure */}
+                            <div className="grid grid-cols-1 gap-4">
+                                <Card className="bg-card border shadow-sm animate-pulse">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><Skeleton className="h-5 w-3/5" /></CardHeader>
+                                    <CardContent><Skeleton className="h-8 w-1/2 mb-1" /><Skeleton className="h-4 w-4/5" /></CardContent>
+                                </Card>
                             </div>
+                            <Card className="bg-card border shadow-sm animate-pulse">
+                                <CardHeader><Skeleton className="h-6 w-1/3" /></CardHeader>
+                                <CardContent><Skeleton className="h-72 w-full" /></CardContent>
+                            </Card>
                         </div>
                     ) : error ? (
                         <Alert variant="destructive">
@@ -86,7 +95,7 @@ function IncomeReportContent() {
                                             {formatCurrency(reportData.totalIncomeInRange)}
                                         </div>
                                         <p className="text-xs text-muted-foreground">
-                                            From {new Date(reportData.startDate).toLocaleDateString()} to {new Date(reportData.endDate).toLocaleDateString()}
+                                            From {new Date(reportData.startDate + 'T00:00:00Z').toLocaleDateString()} to {new Date(reportData.endDate + 'T00:00:00Z').toLocaleDateString()}
                                         </p>
                                     </CardContent>
                                 </Card>
@@ -138,12 +147,30 @@ function LoadingSkeleton() {
                      <Skeleton className="h-4 w-64" />
                  </CardHeader>
                  <CardContent className="p-4 sm:p-6 space-y-6">
-                     <Skeleton className="h-10 w-full max-w-md" />
-                     <Skeleton className="h-10 w-48" />
-                     <Skeleton className="h-72 w-full" />
+                     {/* Skeleton for filters */}
+                     <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 mb-4">
+                       <div className="grid gap-2 w-full sm:w-auto">
+                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-9 w-full sm:w-64" />
+                       </div>
+                       <Skeleton className="h-9 w-24" />
+                       <Skeleton className="h-9 w-24" />
+                     </div>
+                      {/* Skeleton for summary */}
+                      <div className="grid grid-cols-1 gap-4">
+                          <Card className="bg-card border shadow-sm animate-pulse">
+                              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><Skeleton className="h-5 w-3/5" /></CardHeader>
+                              <CardContent><Skeleton className="h-8 w-1/2 mb-1" /><Skeleton className="h-4 w-4/5" /></CardContent>
+                          </Card>
+                      </div>
+                      {/* Skeleton for chart */}
+                      <Card className="bg-card border shadow-sm animate-pulse">
+                          <CardHeader><Skeleton className="h-6 w-1/3" /></CardHeader>
+                          <CardContent><Skeleton className="h-72 w-full" /></CardContent>
+                      </Card>
                  </CardContent>
              </Card>
          </main>
     );
 }
-      
+
