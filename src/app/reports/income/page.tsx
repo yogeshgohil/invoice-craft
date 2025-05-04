@@ -1,7 +1,9 @@
+
 'use client';
 
 import { useState, useEffect, Suspense, type ReactNode } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation'; // Import useRouter
+import Link from 'next/link'; // Import Link
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { IncomeReportFilters } from '@/components/income-report-filters';
 import { IncomeReportChart } from '@/components/income-report-chart';
@@ -9,8 +11,9 @@ import { fetchIncomeReport, type IncomeReportData } from '@/lib/fetch-income-rep
 import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle, IndianRupee, TrendingDown, TrendingUp } from 'lucide-react'; // Added relevant icons
+import { AlertTriangle, IndianRupee, TrendingDown, TrendingUp, ArrowLeft } from 'lucide-react'; // Added ArrowLeft
 import { format as formatDateFns, isValid, parseISO, startOfMonth, endOfMonth } from 'date-fns'; // Renamed 'format' to avoid conflict, added date helpers
+import { Button } from '@/components/ui/button'; // Import Button
 
 // Wrapper Component to use useSearchParams
 function IncomeReportContent() {
@@ -66,11 +69,19 @@ function IncomeReportContent() {
         <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background">
              <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Increased max-width slightly */}
                 {/* Adjusted padding and text sizes in header */}
-                <CardHeader className="border-b pb-3 p-3 sm:p-4">
-                    <CardTitle className="text-base sm:text-lg font-semibold text-primary">Financial Report</CardTitle>
-                    <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-                        Monthly invoiced, paid, and due amounts based on invoice creation date.
-                    </CardDescription>
+                 <CardHeader className="border-b pb-3 p-3 sm:p-4 flex flex-row items-center justify-between">
+                     <div>
+                        <CardTitle className="text-base sm:text-lg font-semibold text-primary">Financial Report</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                            Monthly invoiced, paid, and due amounts based on invoice creation date.
+                        </CardDescription>
+                     </div>
+                     {/* Add Back Button */}
+                     <Link href="/invoices" passHref legacyBehavior>
+                          <Button variant="outline" size="sm" className="h-8 text-xs sm:text-sm">
+                              <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back
+                          </Button>
+                     </Link>
                 </CardHeader>
                 <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4"> {/* Reduced padding/spacing */}
                     <IncomeReportFilters initialStartDate={startDateStr} initialEndDate={endDateStr} />
@@ -185,9 +196,12 @@ function LoadingSkeleton() {
     return (
          <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background">
              <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Increased max-width */}
-                  <CardHeader className="border-b pb-3 p-3 sm:p-4">
-                     <Skeleton className="h-5 sm:h-6 w-32 sm:w-40 mb-1" /> {/* Adjusted size */}
-                     <Skeleton className="h-3.5 sm:h-4 w-48 sm:w-56" /> {/* Adjusted size */}
+                  <CardHeader className="border-b pb-3 p-3 sm:p-4 flex flex-row items-center justify-between">
+                      <div>
+                         <Skeleton className="h-5 sm:h-6 w-32 sm:w-40 mb-1" /> {/* Adjusted size */}
+                         <Skeleton className="h-3.5 sm:h-4 w-48 sm:w-56" /> {/* Adjusted size */}
+                      </div>
+                      <Skeleton className="h-8 w-20" /> {/* Back button skeleton */}
                  </CardHeader>
                  <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4"> {/* Adjusted padding/spacing */}
                      {/* Skeleton for filters - Adjusted layout and size */}
