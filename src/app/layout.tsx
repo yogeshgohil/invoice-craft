@@ -24,6 +24,7 @@ export default function RootLayout({
       <body
         // Removed font variables from className
         className="antialiased" // Use default Tailwind fonts
+        suppressHydrationWarning // Add suppression here for body tag modifications
       >
         <AuthProvider> {/* Wrap children with AuthProvider */}
           <SidebarProvider defaultOpen={true}> {/* Wrap with SidebarProvider */}
