@@ -78,7 +78,7 @@ export function InvoicePreview({ data }: InvoicePreviewProps) {
         </div>
         <div className="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
            {/* Your Company Details */}
-           <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-700">Your Company Name</h2>
+           <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-700">Mahakali Ariwork</h2>
            <p className="text-[10px] sm:text-xs md:text-sm text-gray-500">123 Your Street, Your City, Your State 12345</p>
            <p className="text-[10px] sm:text-xs md:text-sm text-gray-500">your.email@example.com</p>
            <p className="text-[10px] sm:text-xs md:text-sm text-gray-500">(123) 456-7890</p>
