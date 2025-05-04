@@ -156,10 +156,9 @@ function InvoicesContent() {
       };
 
   return (
-     // Reduced padding for mobile view
-     // Removed justify-start to allow center alignment by default?
-    <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
-      <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden">
+    // Reduced padding for mobile view
+    // Removed justify-start to allow center alignment by default?
+    <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-1 sm:space-y-0 sm:space-x-4 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
             <CardTitle className="text-base sm:text-lg font-semibold text-foreground">Invoice</CardTitle> {/* Adjusted font size */}
             {/* Create Button is now moved inside InvoiceViewSwitcher */}
@@ -180,12 +179,14 @@ function InvoicesContent() {
                  // Show a skeleton loading indicator only on initial load
                  <div className="space-y-3"> {/* Reduced spacing */}
                       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2"> {/* Adjusted layout, reduced margin */}
-                         <Skeleton className="h-8 w-full sm:w-[160px] rounded-md" />
-                          <div className='flex items-center justify-end sm:justify-start space-x-1.5'>
-                            <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
-                            <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
-                            <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" /> {/* Added skeleton for create button */}
-                          </div>
+                         <div className="flex items-center justify-start space-x-1.5 order-2 sm:order-1"> {/* Group view toggles */}
+                           <Skeleton className="h-8 w-8 rounded-md" />
+                           <Skeleton className="h-8 w-8 rounded-md" />
+                         </div>
+                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2"> {/* Group create/report */}
+                           <Skeleton className="h-8 w-full sm:w-36 rounded-md" />
+                           <Skeleton className="h-8 w-full sm:w-32 rounded-md" />
+                         </div>
                       </div>
                      {/* Skeleton for List View */}
                       <div className="rounded-lg border">
@@ -219,7 +220,6 @@ function InvoicesContent() {
 
         </CardContent>
       </Card>
-    </main>
   );
 }
 
@@ -227,53 +227,56 @@ function InvoicesContent() {
 export default function InvoicesPage() {
    // Wrap content in Suspense to handle client-side data fetching states
     return (
-        <Suspense fallback={<LoadingSkeleton />}>
-            <InvoicesContent />
-        </Suspense>
+        <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
+            <Suspense fallback={<LoadingSkeleton />}>
+                <InvoicesContent />
+            </Suspense>
+        </main>
     );
 }
 
 // Skeleton component for Suspense fallback
 function LoadingSkeleton() {
     return (
-        <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
-            <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden">
-                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-1 sm:space-y-0 sm:space-x-4 pb-3 border-b p-3 sm:p-4 bg-card">
-                    <Skeleton className="h-5 w-24 rounded" />
-                </CardHeader>
-                <CardContent className="p-3 sm:p-4">
-                    {/* Skeleton for Filters */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 items-end mb-4 sm:mb-6 animate-pulse">
-                        <Skeleton className="h-9 rounded-md" />
-                        <Skeleton className="h-9 rounded-md" />
-                        <Skeleton className="h-9 rounded-md" />
-                        <Skeleton className="h-9 rounded-md" />
-                        <Skeleton className="h-9 rounded-md" />
+        <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden">
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-1 sm:space-y-0 sm:space-x-4 pb-3 border-b p-3 sm:p-4 bg-card">
+                <Skeleton className="h-5 w-24 rounded" />
+            </CardHeader>
+            <CardContent className="p-3 sm:p-4">
+                {/* Skeleton for Filters */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 items-end mb-4 sm:mb-6 animate-pulse">
+                    <Skeleton className="h-9 rounded-md" />
+                    <Skeleton className="h-9 rounded-md" />
+                    <Skeleton className="h-9 rounded-md" />
+                    <Skeleton className="h-9 rounded-md" />
+                    <Skeleton className="h-9 rounded-md" />
+                </div>
+                <Separator className="my-3 sm:my-4" />
+                 {/* Skeleton for View Switcher */}
+                <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2">
+                     <div className="flex items-center justify-start space-x-1.5 order-2 sm:order-1"> {/* Group view toggles */}
+                       <Skeleton className="h-8 w-8 rounded-md" />
+                       <Skeleton className="h-8 w-8 rounded-md" />
+                     </div>
+                     <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2"> {/* Group create/report */}
+                       <Skeleton className="h-8 w-full sm:w-36 rounded-md" />
+                       <Skeleton className="h-8 w-full sm:w-32 rounded-md" />
+                     </div>
+                </div>
+                {/* Skeleton for List View */}
+                <div className="rounded-lg border animate-pulse">
+                    <Skeleton className="h-10 w-full rounded-t-md" />
+                    <div className="divide-y divide-border">
+                        {[...Array(ITEMS_PER_PAGE)].map((_, i) => (
+                            <Skeleton key={i} className="h-12 w-full" />
+                        ))}
                     </div>
-                    <Separator className="my-3 sm:my-4" />
-                     {/* Skeleton for View Switcher */}
-                    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2">
-                        <div className="flex items-center justify-end sm:justify-start space-x-1.5 order-2 sm:order-1">
-                             <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
-                             <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
-                        </div>
-                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2">
-                             <Skeleton className="h-8 w-full sm:w-36 rounded-md" />
-                             <Skeleton className="h-8 w-full sm:w-32 rounded-md" />
-                         </div>
-                    </div>
-                    {/* Skeleton for List View */}
-                    <div className="rounded-lg border animate-pulse">
-                        <Skeleton className="h-10 w-full rounded-t-md" />
-                        <div className="divide-y divide-border">
-                            {[...Array(ITEMS_PER_PAGE)].map((_, i) => (
-                                <Skeleton key={i} className="h-12 w-full" />
-                            ))}
-                        </div>
-                        <Skeleton className="h-8 w-full rounded-b-md"/>
-                    </div>
-                </CardContent>
-            </Card>
-        </main>
+                    <Skeleton className="h-8 w-full rounded-b-md"/>
+                </div>
+            </CardContent>
+        </Card>
     );
 }
+
+
+    
