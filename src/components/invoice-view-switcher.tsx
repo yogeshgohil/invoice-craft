@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { List, LayoutGrid, PlusCircle } from 'lucide-react'; // Removed LineChart
+import { List, LayoutGrid, PlusCircle, LineChart } from 'lucide-react'; // Added LineChart
 import { InvoiceList } from './invoice-list';
 import { InvoiceGrid } from './invoice-grid'; // Import the new grid component
 import type { Invoice } from '@/app/invoices/page'; // Import the Invoice type
@@ -24,38 +24,48 @@ export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted, on
        {/* Use flex-col on small screens, adjust spacing */}
        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2"> {/* Adjusted layout, reduced margin */}
 
-         {/* View Toggle Buttons - Align end */}
-         <div className="flex items-center justify-start sm:justify-start order-2 sm:order-1"> {/* Align start */}
-             <Button
-               variant={view === 'list' ? 'default' : 'outline'}
-               size="icon" // Use icon size for compact buttons
-               onClick={() => setView('list')}
-               className="mr-1.5 h-8 w-8" // Explicit smaller size
-               aria-label="List view"
-             >
-               <List className="h-4 w-4" /> {/* Keep icon size */}
-             </Button>
-             <Button
-               variant={view === 'grid' ? 'default' : 'outline'}
-               size="icon" // Use icon size for compact buttons
-               onClick={() => setView('grid')}
-               aria-label="Grid view"
-               className="h-8 w-8" // Explicit smaller size
-             >
-               <LayoutGrid className="h-4 w-4" /> {/* Keep icon size */}
-             </Button>
+         {/* View Toggle Buttons & Create/Report Buttons */}
+         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch"> {/* Group all buttons */}
+             {/* View Toggle Buttons - Align start */}
+             <div className="flex items-center justify-start order-3 sm:order-1"> {/* Align start */}
+                 <Button
+                   variant={view === 'list' ? 'default' : 'outline'}
+                   size="icon" // Use icon size for compact buttons
+                   onClick={() => setView('list')}
+                   className="mr-1.5 h-8 w-8" // Explicit smaller size
+                   aria-label="List view"
+                 >
+                   <List className="h-4 w-4" /> {/* Keep icon size */}
+                 </Button>
+                 <Button
+                   variant={view === 'grid' ? 'default' : 'outline'}
+                   size="icon" // Use icon size for compact buttons
+                   onClick={() => setView('grid')}
+                   aria-label="Grid view"
+                   className="h-8 w-8" // Explicit smaller size
+                 >
+                   <LayoutGrid className="h-4 w-4" /> {/* Keep icon size */}
+                 </Button>
+             </div>
+
+             {/* Create Button and Report Button */}
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2"> {/* Group buttons */}
+                  {/* Create New Bill Button */}
+                  <Link href="/invoices/new" passHref legacyBehavior>
+                      <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                          <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create New Bill {/* Adjusted icon margin/size */}
+                      </Button>
+                  </Link>
+                   {/* View Report Button */}
+                  <Link href="/reports/income" passHref legacyBehavior>
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                          <LineChart className="mr-1.5 h-3.5 w-3.5" /> View Report {/* Adjusted icon margin/size */}
+                      </Button>
+                  </Link>
+              </div>
          </div>
 
-         {/* Create Button and View Toggle Group */}
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2"> {/* Group buttons */}
-              {/* Create New Bill Button */}
-              <Link href="/invoices/new" passHref legacyBehavior>
-                  <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                      <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create New Bill {/* Adjusted icon margin/size */}
-                  </Button>
-              </Link>
-              {/* REMOVED Income Report Button */}
-          </div>
+
       </div>
 
       {/* Conditional rendering based on fetchError */}
@@ -96,5 +106,3 @@ export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted, on
   );
 }
 
-
-    
