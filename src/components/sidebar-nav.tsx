@@ -8,7 +8,7 @@ import {
   SidebarHeader,
   SidebarContent,
   SidebarFooter,
-  SidebarTrigger,
+  // SidebarTrigger, // Trigger might not be needed if hover-based
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, BarChart3, LogOut, Settings, User } from 'lucide-react'; // Added icons
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context'; // Import useAuth
+import { cn } from '@/lib/utils'; // Import cn for conditional classes
 
 export function SidebarNav() {
   const pathname = usePathname();
@@ -32,29 +33,30 @@ export function SidebarNav() {
     return pathname === path;
   };
 
-  // Don't render sidebar on login page
+  // Don't render sidebar on login page or if not authenticated
   if (pathname === '/login' || !isAuthenticated) {
       return null;
   }
 
 
   return (
-    <Sidebar>
+    // Use collapsible="icon" for hover behavior on desktop
+    <Sidebar collapsible="icon">
       <SidebarHeader>
          {/* Simplified header - Add logo/title if needed */}
         <div className="flex items-center gap-2 p-2">
            {/* Placeholder for Logo/Icon */}
-           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-primary">
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-primary shrink-0"> {/* Added shrink-0 */}
               <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
               <line x1="16" y1="17" x2="8" y2="17"></line>
               <line x1="10" y1="9" x2="8" y2="9"></line>
            </svg>
-           {state === 'expanded' && <h2 className="font-semibold text-lg text-foreground">Create Bill</h2>}
+           {/* Conditionally render title based on state */}
+           <h2 className={cn("font-semibold text-lg text-foreground whitespace-nowrap overflow-hidden transition-opacity duration-200", state === 'collapsed' ? 'opacity-0 w-0' : 'opacity-100 w-auto')}>Create Bill</h2>
         </div>
-        {/* Optional: Add SidebarTrigger if needed within header */}
-        {/* <SidebarTrigger className="absolute right-2 top-3 md:hidden" /> */}
+        {/* Removed SidebarTrigger */}
       </SidebarHeader>
 
       <SidebarContent className="flex-grow">
@@ -91,23 +93,23 @@ export function SidebarNav() {
          {/* User Profile / Logout */}
         <div className="flex items-center justify-between gap-2 p-2">
            <div className='flex items-center gap-2 overflow-hidden'>
-             <Avatar className="h-7 w-7">
+             <Avatar className="h-7 w-7 shrink-0"> {/* Added shrink-0 */}
                <AvatarImage src="https://picsum.photos/40/40?grayscale" alt="User Avatar" data-ai-hint="user avatar grayscale"/>
                <AvatarFallback>U</AvatarFallback> {/* Fallback initials */}
              </Avatar>
-              {state === 'expanded' && (
-                  <div className='flex flex-col text-xs truncate'>
-                      <span className="font-medium text-foreground truncate">Demo User</span>
-                      <span className="text-muted-foreground truncate">demo@example.com</span>
-                  </div>
-              )}
+              {/* Conditionally render user details based on state */}
+              <div className={cn('flex flex-col text-xs truncate transition-opacity duration-200', state === 'collapsed' ? 'opacity-0 w-0' : 'opacity-100 w-auto')}>
+                  <span className="font-medium text-foreground truncate">Demo User</span>
+                  <span className="text-muted-foreground truncate">demo@example.com</span>
+              </div>
            </div>
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 shrink-0"
+            className="h-7 w-7 shrink-0" // Keep button size consistent
             onClick={logout}
             aria-label="Logout"
+            // Tooltip always shown when collapsed
              tooltip={state === 'collapsed' ? 'Logout' : undefined}
           >
             <LogOut className="h-4 w-4" />

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -84,7 +85,10 @@ const SidebarProvider = React.forwardRef<
         }
 
         // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        // Only set cookie on explicit toggle, not on hover for desktop
+        // if (isMobile || !document.body.matches(':hover')) { // A potential check, but complex
+             document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        // }
       },
       [setOpenProp, open]
     )
@@ -168,14 +172,33 @@ const Sidebar = React.forwardRef<
     {
       side = "left",
       variant = "sidebar",
-      collapsible = "offcanvas",
+      collapsible = "icon", // Default to icon collapsible for hover effect
       className,
       children,
       ...props
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, open, setOpen, openMobile, setOpenMobile } = useSidebar()
+
+    const handleMouseEnter = () => {
+        // Only expand on hover if collapsed and not mobile
+        if (!isMobile && state === 'collapsed') {
+            setOpen(true);
+        }
+    };
+
+    const handleMouseLeave = () => {
+        // Only collapse on mouse leave if expanded and not mobile
+         if (!isMobile && state === 'expanded') {
+             // We need a way to differentiate between hover-triggered expansion
+             // and click-triggered expansion. For simplicity, this will always
+             // collapse on leave if expanded. A more complex solution could
+             // track the trigger source.
+             setOpen(false);
+         }
+    };
+
 
     if (collapsible === "none") {
       return (
@@ -220,6 +243,8 @@ const Sidebar = React.forwardRef<
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
+        onMouseEnter={handleMouseEnter} // Add mouse enter handler
+        onMouseLeave={handleMouseLeave} // Add mouse leave handler
       >
         {/* This is what handles the sidebar gap on desktop */}
         <div
@@ -248,7 +273,7 @@ const Sidebar = React.forwardRef<
         >
           <div
             data-sidebar="sidebar"
-            className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+            className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow overflow-hidden" // Add overflow-hidden
           >
             {children}
           </div>
@@ -318,11 +343,16 @@ const SidebarInset = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"main">
 >(({ className, ...props }, ref) => {
+  const { isMobile, state } = useSidebar(); // Get state
+
   return (
     <main
       ref={ref}
       className={cn(
-        "relative flex min-h-svh flex-1 flex-col bg-background",
+        "relative flex min-h-svh flex-1 flex-col bg-background transition-[margin-left] duration-200 ease-linear", // Add transition
+        // Adjust margin based on sidebar state for desktop
+        !isMobile && state === 'expanded' && "ml-[--sidebar-width]",
+        !isMobile && state === 'collapsed' && "ml-[--sidebar-width-icon]",
         "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
         className
       )}
@@ -549,6 +579,7 @@ const SidebarMenuButton = React.forwardRef<
       size = "default",
       tooltip,
       className,
+      children, // Destructure children
       ...props
     },
     ref
@@ -556,7 +587,7 @@ const SidebarMenuButton = React.forwardRef<
     const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
 
-    const button = (
+    const buttonContent = (
       <Comp
         ref={ref}
         data-sidebar="menu-button"
@@ -564,11 +595,28 @@ const SidebarMenuButton = React.forwardRef<
         data-active={isActive}
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
-      />
-    )
+      >
+          {children}
+          {/* Ensure text spans don't render when collapsed */}
+          {/* Find the span and hide it when collapsed */}
+          {React.Children.map(children, child => {
+            if (React.isValidElement(child) && typeof child.type === 'string' && child.type === 'span') {
+                 return React.cloneElement(child as React.ReactElement<any>, {
+                    className: cn((child.props as any).className, state === 'collapsed' ? 'hidden' : 'inline'),
+                 });
+             }
+             // Keep icons visible
+             if (React.isValidElement(child) && typeof child.type !== 'string') {
+                return child;
+             }
+             return null; // Hide other direct text nodes when collapsed
+          })}
+      </Comp>
+    );
+
 
     if (!tooltip) {
-      return button
+      return buttonContent
     }
 
     if (typeof tooltip === "string") {
@@ -579,7 +627,7 @@ const SidebarMenuButton = React.forwardRef<
 
     return (
       <Tooltip>
-        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
         <TooltipContent
           side="right"
           align="center"
