@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCap
 import { Separator } from '@/components/ui/separator';
 import { formatCurrency } from '@/lib/utils'; // Import utility
 import { Badge } from '@/components/ui/badge'; // Import Badge
+import { format, parseISO } from 'date-fns'; // Import date-fns
 
 interface InvoicePreviewProps {
   data: InvoiceFormData;
@@ -22,25 +23,21 @@ export function InvoicePreview({ data }: InvoicePreviewProps) {
   const totalDue = totalAmount - paidAmount;
 
 
-   // Helper function to format date (handles potential timezone issues)
-   const formatDate = (dateString: string) => {
-     try {
-       // Adding 'T00:00:00' assumes the date is local timezone if no time is provided
-       // Ensure consistent parsing across environments
-       const [year, month, day] = dateString.split('-').map(Number);
-       const date = new Date(Date.UTC(year, month - 1, day)); // Use UTC to avoid timezone shifts
-       if (isNaN(date.getTime())) { // Check if date is valid
-         return 'Invalid Date';
-       }
-       return date.toLocaleDateString('en-US', { // Use en-IN for Indian date format if preferred
-         year: 'numeric',
-         month: 'long',
-         day: 'numeric',
-         timeZone: 'UTC', // Specify timezone for consistency
-       });
-     } catch (e) {
-       return 'Invalid Date';
-     }
+   // Helper function to format date (handles potential timezone issues and invalid dates)
+   const formatDate = (dateString: string | undefined | Date): string => {
+    if (!dateString) return 'N/A';
+    try {
+        const date = typeof dateString === 'string' ? parseISO(dateString) : dateString;
+         if (isNaN(date.getTime())) { // Check if date is valid after ISO parsing
+             // Fallback: try parsing YYYY-MM-DD, assuming UTC
+             const manualDate = new Date(dateString + 'T00:00:00Z');
+             if (isNaN(manualDate.getTime())) return 'Invalid Date';
+             return format(manualDate, 'MMM d, yyyy'); // Format: Jul 15, 2024
+         }
+        return format(date, 'MMM d, yyyy'); // Format: Jul 15, 2024
+    } catch (e) {
+        return 'Invalid Date';
+    }
    };
 
    // Helper function to get badge variant based on status
@@ -214,4 +211,3 @@ if (typeof window !== 'undefined') {
     document.head.appendChild(styleSheet);
   }
 }
-

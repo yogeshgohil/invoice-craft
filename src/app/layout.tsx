@@ -1,17 +1,13 @@
 
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist } from 'next/font/google'; // Keep Geist Sans only if needed
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster'; // Import Toaster
 import { AuthProvider } from '@/contexts/auth-context'; // Import AuthProvider
 
+// Use Geist Sans if specifically desired, otherwise remove font imports
 const geistSans = Geist({
   variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
   subsets: ['latin'],
 });
 
@@ -29,14 +25,11 @@ export default function RootLayout({
     <html lang="en">
       {/*
         Added suppressHydrationWarning to the body tag.
-        The hydration error reported ("Expected server HTML to contain a matching <body> in <html>")
-        often occurs when browser extensions (like Grammarly) inject elements or attributes into the DOM
-        before React hydrates the page. This causes a mismatch between the server-rendered HTML
-        and the client-side HTML structure React expects.
-        suppressHydrationWarning tells React to ignore these specific mismatches on this element.
+        This can help ignore hydration mismatches caused by browser extensions.
       */}
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        // Apply font variable if using Geist Sans, otherwise use default Tailwind fonts
+        className={`${geistSans.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <AuthProvider> {/* Wrap children with AuthProvider */}

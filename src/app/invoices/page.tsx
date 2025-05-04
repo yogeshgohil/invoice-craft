@@ -51,6 +51,7 @@ export default function InvoicesPage() {
           const fetchedInvoices = await fetchInvoices(filters);
           setInvoices(fetchedInvoices);
         } catch (error: any) {
+          console.error("Error fetching invoices:", error); // Log the actual error
           setFetchError(error.message || "An unknown error occurred while loading invoices.");
         } finally {
           setIsLoading(false);
@@ -86,11 +87,11 @@ export default function InvoicesPage() {
                  <div className="space-y-4">
                      <div className="flex justify-between items-center mb-4 space-x-2"> {/* Adjusted layout */}
                         {/* Skeleton for create button */}
-                        <Skeleton className="h-9 w-[180px] rounded-md" />
+                        <Skeleton className="h-9 w-32 sm:w-[180px] rounded-md" />
                         {/* Skeletons for view toggle buttons */}
                          <div className='flex items-center space-x-2'>
-                           <Skeleton className="h-9 w-9 rounded-md" />
-                           <Skeleton className="h-9 w-9 rounded-md" />
+                           <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-md" />
+                           <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-md" />
                          </div>
                      </div>
                      {/* Skeleton for List View */}

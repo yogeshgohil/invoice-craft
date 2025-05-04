@@ -1,5 +1,5 @@
 
-'use client'; // Convert to Client Component
+'use client'; // Ensure this is a Client Component
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation'; // Use useParams hook
@@ -26,7 +26,7 @@ export default function EditInvoicePage(props: EditInvoicePageProps) {
 
   useEffect(() => {
     if (!id) {
-      // Handle cases where ID might not be available initially (though usually it is)
+      // Handle cases where ID might not be available initially
       setIsLoading(false);
       setFetchError("Invoice ID is missing.");
       return;
@@ -45,6 +45,7 @@ export default function EditInvoicePage(props: EditInvoicePageProps) {
           setInvoice(fetchedInvoice);
         }
       } catch (error: any) {
+        console.error("Error fetching invoice:", error); // Log the actual error
         setFetchError(error.message || "An unknown error occurred while loading the invoice data.");
       } finally {
         setIsLoading(false);
@@ -64,7 +65,7 @@ export default function EditInvoicePage(props: EditInvoicePageProps) {
                <Skeleton className="h-6 w-48 mb-1 rounded" />
                <Skeleton className="h-4 w-64 rounded" />
              </div>
-             <Skeleton className="h-9 w-40 rounded-md" />
+             <Skeleton className="h-9 w-32 sm:w-40 rounded-md" />
            </CardHeader>
            <CardContent className="p-0">
                {/* Simplified skeleton for the form area */}
@@ -72,7 +73,7 @@ export default function EditInvoicePage(props: EditInvoicePageProps) {
                    <Skeleton className="h-40 w-full rounded-md" />
                    <Skeleton className="h-60 w-full rounded-md" />
                    <Skeleton className="h-20 w-full rounded-md" />
-                   <div className="flex justify-end space-x-2">
+                   <div className="flex flex-wrap justify-end gap-2">
                        <Skeleton className="h-9 w-24 rounded-md" />
                        <Skeleton className="h-9 w-24 rounded-md" />
                        <Skeleton className="h-9 w-32 rounded-md" />
