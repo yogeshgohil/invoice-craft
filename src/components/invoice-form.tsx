@@ -198,7 +198,6 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
          return;
      }
     const data = form.getValues();
-    console.log('Updating Preview Data:', data);
     setInvoiceData(data); // Set data to trigger preview rendering inside the dialog
     // Toast notification might be excessive here, dialog opening is enough feedback
     // toast({ title: "Preview Ready", description: "Invoice preview updated." });
@@ -221,7 +220,6 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
         }
 
         const data = form.getValues();
-        console.log(`Attempting to ${isEditMode ? 'update' : 'save'} Invoice Data:`, data);
 
         const apiUrl = isEditMode ? `/api/invoices/${data._id}` : '/api/invoices';
         const method = isEditMode ? 'PUT' : 'POST';
@@ -243,29 +241,21 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
                  errorMessage = serverMessage || errorMessage;
 
                  if (errorData.errors) {
-                    console.error("Server Validation Errors:", errorData.errors);
                      errorMessage = 'Validation failed on the server. Please check your inputs.';
                  } else if (response.status === 503 && serverMessage.toLowerCase().includes('database connection error')) {
                     // Specific handling for DB connection error
-                    console.error("Database connection error reported by API.");
                     errorMessage = 'Database connection error. Please check the server logs and database configuration.';
                  } else if (response.status === 409) { // Conflict (duplicate invoice number)
-                     console.warn("API reported conflict (409). API Message:", serverMessage);
                      errorMessage = serverMessage || 'Invoice conflict (e.g., duplicate number).';
                  } else if (response.status === 404) { // Not Found (for updates)
-                     console.warn("API reported Not Found (404). API Message:", serverMessage);
                      errorMessage = serverMessage || 'Invoice not found for update.';
                  } else {
-                    console.error(`API Error (${response.status}): ${errorMessage}`);
                  }
             } catch (jsonError) {
-                console.error("Failed to parse error response JSON:", jsonError);
                 errorMessage = response.statusText || `HTTP error! Status: ${response.status}`;
                  if (response.status === 503) {
                      errorMessage = 'Service unavailable (503). Server/DB issue.';
-                     console.error(errorMessage);
                  } else {
-                     console.error(`API Error (${response.status}): ${errorMessage}`);
                  }
             }
             // Set the specific error message for the toast
@@ -274,7 +264,6 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
         }
 
         const result = await response.json();
-        console.log(`Invoice ${isEditMode ? 'updated' : 'saved'} successfully:`, result);
         toast({
             title: `Invoice ${isEditMode ? 'Updated' : 'Saved'}`,
             description: `Invoice ${data.invoiceNumber} has been ${isEditMode ? 'updated' : 'saved'} successfully.`,
@@ -288,7 +277,6 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
         router.push('/invoices');
 
     } catch (error: any) {
-        console.error(`Failed to ${isEditMode ? 'update' : 'save'} invoice:`, error);
         const finalErrorDescription = errorToastDescription.startsWith(`Could not ${isEditMode ? 'update' : 'save'} invoice:`)
             ? errorToastDescription
             : error.message || 'An unknown error occurred.';
@@ -319,7 +307,6 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
 
 
     if (!invoicePreviewRef.current || !currentData) {
-      console.error("Invoice preview element or data not found for PDF generation");
       toast({ title: "Error", description: "Could not generate PDF. Preview data missing.", variant: "destructive"});
       return;
     }
@@ -377,7 +364,6 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
         toast({ title: "Download Started", description: "Your invoice PDF is being downloaded."});
 
     } catch (error) {
-        console.error("Error generating PDF:", error);
         toast({ title: "PDF Generation Failed", description: "An error occurred while creating the PDF.", variant: "destructive" });
         // Ensure hidden state is restored even on error
         if (invoicePreviewRef.current) {

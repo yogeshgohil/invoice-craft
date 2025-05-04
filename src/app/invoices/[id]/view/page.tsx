@@ -45,7 +45,6 @@ export default function ViewInvoicePage(props: ViewInvoicePageProps) {
             setInvoice(fetchedInvoice);
         }
       } catch (error: any) {
-        console.error(`Error fetching invoice ${id} for view page:`, error);
         setFetchError(error.message || "An unknown error occurred while loading the invoice data.");
       } finally {
         setIsLoading(false);

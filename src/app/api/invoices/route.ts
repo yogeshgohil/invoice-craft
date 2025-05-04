@@ -14,22 +14,18 @@ export async function POST(request: Request) {
     // Attempt to connect to the database first
     try {
         await connectDB();
-        console.log('Database connected for POST request.');
         if (!isConnected()) {
             throw new Error('Database connected but readyState is not 1.');
         }
     } catch (dbError: any) {
-        console.error('Database connection failed in POST route:', dbError);
         // Provide a more specific message for DB connection failure
         return NextResponse.json({ message: 'Database connection error. Please check server configuration, environment variables (MONGODB_URI), and database status/IP allowlist.', error: dbError.message || 'Failed to connect to DB' }, { status: 503 }); // Service Unavailable
     }
 
     const invoiceData: InvoiceFormData = await request.json();
-    console.log("Received invoice data:", invoiceData);
 
     // Basic validation (though Mongoose schema handles more)
     if (!invoiceData || !invoiceData.invoiceNumber || !invoiceData.customerName || !invoiceData.items || invoiceData.items.length === 0 || !invoiceData.status) { // Added status check
-      console.warn('Validation failed: Missing required invoice fields.');
       return NextResponse.json({ message: 'Missing required invoice fields (including status).' }, { status: 400 });
     }
 
@@ -39,7 +35,6 @@ export async function POST(request: Request) {
     const parsedDueDate = new Date(invoiceData.dueDate + 'T00:00:00Z'); // Use UTC or ensure consistent timezone handling
 
     if (isNaN(parsedInvoiceDate.getTime()) || isNaN(parsedDueDate.getTime())) {
-         console.warn('Validation failed: Invalid date format received.');
          return NextResponse.json({ message: 'Invalid date format provided. Use YYYY-MM-DD.' }, { status: 400 });
     }
 
@@ -51,28 +46,23 @@ export async function POST(request: Request) {
         // Status is already included in invoiceData
     });
 
-    console.log("Attempting to save invoice:", newInvoice.invoiceNumber);
 
     // Check connection again right before saving
     if (!isConnected()) {
-        console.error('Database disconnected before save operation.');
         return NextResponse.json({ message: 'Database connection lost before save. Please try again.', error: 'Disconnected' }, { status: 503 });
     }
 
     // Save the document to the database
     const savedInvoice = await newInvoice.save();
 
-    console.log('Invoice saved successfully:', savedInvoice.invoiceNumber);
 
     // Return the saved invoice data
     return NextResponse.json({ message: 'Invoice saved successfully', data: savedInvoice }, { status: 201 });
 
   } catch (error: any) {
-    console.error('Error saving invoice:', error);
 
     // Handle Mongoose Validation Errors specifically
     if (error instanceof mongoose.Error.ValidationError) {
-      console.warn('Mongoose validation failed:', error.errors);
       // Extract specific error messages for better feedback
        const validationErrors = Object.values(error.errors).map(err => err.message);
       return NextResponse.json({ message: 'Validation Error', errors: validationErrors }, { status: 400 });
@@ -80,13 +70,11 @@ export async function POST(request: Request) {
 
     // Handle potential duplicate key errors (e.g., unique invoiceNumber)
     if (error.code === 11000 && error.keyPattern?.invoiceNumber) {
-       console.warn(`Duplicate key error: Invoice number '${error.keyValue?.invoiceNumber}' already exists.`);
        return NextResponse.json({ message: `Invoice number '${error.keyValue?.invoiceNumber}' already exists. Please use a different number.` }, { status: 409 }); // Conflict
     }
 
      // Handle specific database connection error scenarios during save
      if (error.message.toLowerCase().includes('database connection error') || error.message.toLowerCase().includes('service unavailable') || error.name === 'MongooseServerSelectionError' || error.message.toLowerCase().includes('connection refused')) {
-        console.error('Database connection issue during save:', error.message);
         // Use the more specific message if available from connectDB or mongoose
         const specificMessage = error.message.includes('Database connection error') ? error.message : 'Unable to connect to the database. Please check connection and configuration.';
         return NextResponse.json({ message: specificMessage, error: error.name || 'DB Connection Error' }, { status: 503 });
@@ -94,7 +82,6 @@ export async function POST(request: Request) {
 
     // Handle other potential Mongoose or database errors
     if (error instanceof mongoose.Error) {
-        console.error('Mongoose specific error during save:', error.message);
         return NextResponse.json({ message: 'Database operation failed during save', error: error.message }, { status: 500 });
     }
 
@@ -111,19 +98,16 @@ export async function GET(request: NextRequest) { // Use NextRequest to access s
      // Attempt to connect to the database first
      try {
         await connectDB();
-        console.log('Database connected for GET request.');
          if (!isConnected()) {
             throw new Error('Database connected but readyState is not 1.');
         }
     } catch (dbError: any) {
-        console.error('Database connection failed in GET route:', dbError);
         // Provide a more specific message for DB connection failure
         return NextResponse.json({ message: 'Database connection error. Please check server configuration, environment variables (MONGODB_URI), and database status/IP allowlist.', error: dbError.message || 'Failed to connect to DB' }, { status: 503 }); // Service Unavailable
     }
 
     // Check connection again right before finding
     if (!isConnected()) {
-        console.error('Database disconnected before find operation.');
         return NextResponse.json({ message: 'Database connection lost before fetching invoices. Please try again.', error: 'Disconnected' }, { status: 503 });
     }
 
@@ -153,7 +137,6 @@ export async function GET(request: NextRequest) { // Use NextRequest to access s
             dueDateQuery.$gte = new Date(dueDateStart + 'T00:00:00Z');
              if (isNaN(dueDateQuery.$gte.getTime())) throw new Error('Invalid start date');
         } catch (e) {
-             console.warn("Invalid dueDateStart format:", dueDateStart);
              // Optionally return an error or ignore the filter
              return NextResponse.json({ message: 'Invalid start date format. Use YYYY-MM-DD.' }, { status: 400 });
         }
@@ -164,7 +147,6 @@ export async function GET(request: NextRequest) { // Use NextRequest to access s
             dueDateQuery.$lte = new Date(dueDateEnd + 'T23:59:59.999Z');
             if (isNaN(dueDateQuery.$lte.getTime())) throw new Error('Invalid end date');
         } catch (e) {
-            console.warn("Invalid dueDateEnd format:", dueDateEnd);
             // Optionally return an error or ignore the filter
             return NextResponse.json({ message: 'Invalid end date format. Use YYYY-MM-DD.' }, { status: 400 });
         }
@@ -173,28 +155,23 @@ export async function GET(request: NextRequest) { // Use NextRequest to access s
         query.dueDate = dueDateQuery;
     }
 
-    console.log("Executing find with query:", JSON.stringify(query));
 
     // Fetch invoices from the database based on the query, sorting by invoiceDate descending
     const invoices = await Invoice.find(query).sort({ invoiceDate: -1 });
 
-    console.log(`Fetched ${invoices.length} invoices successfully with filters.`);
 
     return NextResponse.json({ invoices }, { status: 200 });
 
   } catch (error: any) {
-     console.error('Error fetching invoices:', error);
 
       // Handle specific database connection error scenarios during fetch
       if (error.message.toLowerCase().includes('database connection error') || error.message.toLowerCase().includes('service unavailable') || error.name === 'MongooseServerSelectionError' || error.message.toLowerCase().includes('connection refused')) {
-         console.error('Database connection issue during fetch:', error.message);
           const specificMessage = error.message.includes('Database connection error') ? error.message : 'Unable to connect to the database. Please check connection and configuration.';
          return NextResponse.json({ message: specificMessage, error: error.name || 'DB Connection Error' }, { status: 503 });
      }
 
      // Handle other potential Mongoose or database errors during fetch
      if (error instanceof mongoose.Error) {
-        console.error('Mongoose specific error during fetch:', error.message);
         return NextResponse.json({ message: 'Database query failed', error: error.message }, { status: 500 });
      }
 

@@ -39,7 +39,6 @@ export function InvoicePreview({ data }: InvoicePreviewProps) {
          timeZone: 'UTC', // Specify timezone for consistency
        });
      } catch (e) {
-       console.error("Error formatting date:", e);
        return 'Invalid Date';
      }
    };

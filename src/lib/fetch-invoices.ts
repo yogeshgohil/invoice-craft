@@ -19,7 +19,6 @@ export async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
     if (filters.dueDateEnd) queryParams.append('dueDateEnd', filters.dueDateEnd);
 
     const apiUrl = `/api/invoices?${queryParams.toString()}`; // Use relative URL
-    console.log(`Fetching invoices from: ${apiUrl}`);
 
     try {
         const response = await fetch(apiUrl, {
@@ -36,19 +35,15 @@ export async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
                 const errorData = await response.json();
                 errorBody = errorData.message || `HTTP error! status: ${response.status}`;
             } catch (e) {
-                console.error("Could not parse error response body:", e);
                 errorBody = `HTTP error! status: ${response.status} ${response.statusText || ''}`.trim();
             }
-            console.error(`Error fetching invoices: ${response.status} ${response.statusText}`, errorBody);
             throw new Error(errorBody);
         }
 
         const data = await response.json();
         if (!data || !Array.isArray(data.invoices)) {
-            console.error('Invalid data structure received from API:', data);
             throw new Error('Invalid data structure received from API.');
         }
-        console.log(`Successfully fetched ${data.invoices.length} invoices.`);
         // Ensure dates are Dates or strings as needed by consumers
         return data.invoices.map((invoice: any) => ({
             ...invoice,
@@ -56,7 +51,6 @@ export async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
             dueDate: invoice.dueDate,         // Decide based on usage
         })) as Invoice[];
     } catch (error) {
-        console.error('An error occurred while fetching invoices:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         throw new Error(`Failed to load invoices. Please check the API connection or try again later. Original error: ${errorMessage}`);
     }

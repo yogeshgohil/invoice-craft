@@ -51,7 +51,6 @@ export default function InvoicesPage() {
           const fetchedInvoices = await fetchInvoices(filters);
           setInvoices(fetchedInvoices);
         } catch (error: any) {
-          console.error("Error in InvoicesPage fetching data:", error);
           setFetchError(error.message || "An unknown error occurred while loading invoices.");
         } finally {
           setIsLoading(false);

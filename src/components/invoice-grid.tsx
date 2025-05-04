@@ -30,7 +30,6 @@ const parseDateSafe = (dateString: string | undefined | Date): Date | null => {
         }
         return date;
     } catch (e) {
-        console.error("Error parsing date:", dateString, e);
         return null;
     }
 };
@@ -42,7 +41,6 @@ const formatDate = (date: Date | null): string => {
     try {
         return format(date, 'MMM d, yyyy'); // Format as 'Jul 15, 2024'
     } catch (e) {
-        console.error("Error formatting date:", date, e);
         return 'Invalid Date';
     }
 };
@@ -179,7 +177,6 @@ export function InvoiceGrid({ initialInvoices }: InvoiceGridProps) {
              });
 
          } catch (error: any) {
-             console.error("Failed to update invoice status:", error);
              toast({
                 title: "Update Failed",
                 description: `Could not update status: ${error.message}`,

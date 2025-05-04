@@ -16,7 +16,6 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error("View Invoice Page Error:", error)
   }, [error])
 
   return (

@@ -35,7 +35,6 @@ const formatDate = (dateString: string | undefined | Date): string => {
          }
         return format(date, 'MMM d, yyyy'); // Format: Jul 15, 2024
     } catch (e) {
-        console.error("Error formatting date:", dateString, e);
         return 'Invalid Date';
     }
 };

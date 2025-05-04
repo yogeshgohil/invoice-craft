@@ -15,7 +15,6 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
     // This check should ideally run after the initial auth state check in AuthProvider
     // to avoid flickering between login and protected routes.
     if (typeof window !== 'undefined' && !isAuthenticated && pathname !== '/login') {
-       console.log('ProtectedRoute: Not authenticated, redirecting to login...');
        router.replace('/login');
     }
   }, [isAuthenticated, router, pathname]);

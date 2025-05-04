@@ -31,13 +31,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             return NextResponse.json({ message: 'Invoice not found.' }, { status: 404 });
         }
 
-        console.log(`Invoice ${id} fetched successfully.`);
         return NextResponse.json({ data: invoice }, { status: 200 });
 
     } catch (error: any) {
-        console.error(`Error fetching invoice ${id}:`, error);
          if (error.message.toLowerCase().includes('database connection error') || error.name === 'MongooseServerSelectionError' || error.message.toLowerCase().includes('connection refused')) {
-            console.error('Database connection issue during GET:', error.message);
             return NextResponse.json({ message: 'Database connection issue during fetch.', error: error.name || 'DB Connection Error' }, { status: 503 });
         }
         const errorMessage = error instanceof Error ? error.message : 'Internal Server Error during fetch.';
@@ -61,7 +58,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         const invoiceData: Partial<InvoiceFormData> = await request.json();
-        console.log(`Received data for updating invoice ${id}:`, invoiceData);
 
         // Basic validation (Mongoose schema will handle more)
         if (!invoiceData || Object.keys(invoiceData).length === 0) {
@@ -119,11 +115,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             return NextResponse.json({ message: 'Invoice not found.' }, { status: 404 });
         }
 
-        console.log(`Invoice ${id} updated successfully.`);
         return NextResponse.json({ message: 'Invoice updated successfully', data: updatedInvoice }, { status: 200 });
 
     } catch (error: any) {
-        console.error(`Error updating invoice ${id}:`, error);
 
         if (error instanceof mongoose.Error.ValidationError) {
             const validationErrors = Object.values(error.errors).map(err => err.message);
@@ -134,11 +128,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
            return NextResponse.json({ message: `Invoice number '${error.keyValue?.invoiceNumber}' already exists. Cannot update to duplicate number.` }, { status: 409 });
         }
         if (error.message.toLowerCase().includes('database connection error') || error.name === 'MongooseServerSelectionError' || error.message.toLowerCase().includes('connection refused')) {
-            console.error('Database connection issue during PUT:', error.message);
             return NextResponse.json({ message: 'Database connection issue during update.', error: error.name || 'DB Connection Error' }, { status: 503 });
         }
         if (error instanceof mongoose.Error) {
-            console.error('Mongoose specific error during update:', error.message);
             return NextResponse.json({ message: 'Database operation failed during update', error: error.message }, { status: 500 });
         }
         const errorMessage = error instanceof Error ? error.message : 'Internal Server Error during update.';
@@ -163,7 +155,6 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
                 throw new Error('Database connected but readyState is not 1.');
             }
         } catch (dbError: any) {
-            console.error('Database connection failed in PATCH route:', dbError);
             return NextResponse.json({ message: 'Database connection error. Please check configuration and status.', error: dbError.message || 'Failed to connect to DB' }, { status: 503 });
         }
 
@@ -177,7 +168,6 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
         // Check connection again before updating
         if (!isConnected()) {
-            console.error('Database disconnected before update operation.');
             return NextResponse.json({ message: 'Database connection lost before update. Please try again.', error: 'Disconnected' }, { status: 503 });
         }
 
@@ -192,13 +182,11 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
             return NextResponse.json({ message: 'Invoice not found.' }, { status: 404 });
         }
 
-        console.log(`Invoice ${id} status updated successfully to: ${status}`);
 
         // Return the updated invoice data
         return NextResponse.json({ message: 'Invoice status updated successfully', data: updatedInvoice }, { status: 200 });
 
     } catch (error: any) {
-        console.error(`Error updating invoice ${id} status via PATCH:`, error);
 
         if (error instanceof mongoose.Error.ValidationError) {
             const validationErrors = Object.values(error.errors).map(err => err.message);
@@ -206,12 +194,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
         }
 
         if (error.message.toLowerCase().includes('database connection error') || error.name === 'MongooseServerSelectionError' || error.message.toLowerCase().includes('connection refused')) {
-            console.error('Database connection issue during PATCH update:', error.message);
             return NextResponse.json({ message: 'Database connection issue during status update.', error: error.name || 'DB Connection Error' }, { status: 503 });
         }
 
         if (error instanceof mongoose.Error) {
-            console.error('Mongoose specific error during PATCH update:', error.message);
             return NextResponse.json({ message: 'Database operation failed during status update', error: error.message }, { status: 500 });
         }
 
