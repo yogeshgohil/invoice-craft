@@ -43,25 +43,31 @@ export default function InvoicesPage() {
         dueDateEnd: searchParams.get('dueDateEnd') || undefined,
     };
 
-    useEffect(() => {
-      const loadInvoices = async () => {
-        setIsLoading(true);
-        setFetchError(null); // Reset error on new fetch
-        try {
-          const fetchedInvoices = await fetchInvoices(filters);
-          setInvoices(fetchedInvoices);
-        } catch (error: any) {
-          console.error("Error fetching invoices:", error); // Log the actual error
-          setFetchError(error.message || "An unknown error occurred while loading invoices.");
-        } finally {
-          setIsLoading(false);
-        }
-      };
+    const loadInvoices = async () => {
+      setIsLoading(true);
+      setFetchError(null); // Reset error on new fetch
+      try {
+        const fetchedInvoices = await fetchInvoices(filters);
+        setInvoices(fetchedInvoices);
+      } catch (error: any) {
+        console.error("Error fetching invoices:", error); // Log the actual error
+        setFetchError(error.message || "An unknown error occurred while loading invoices.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
+
+    useEffect(() => {
       loadInvoices();
     // Re-fetch when searchParams change (dependency array includes searchParams)
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams]);
+
+     // Handler to remove deleted invoice from the list
+     const handleInvoiceDeleted = (deletedInvoiceId: string) => {
+         setInvoices(prevInvoices => prevInvoices.filter(invoice => invoice._id !== deletedInvoiceId));
+     };
 
   return (
      // Reduced padding for mobile view
@@ -86,15 +92,15 @@ export default function InvoicesPage() {
             {isLoading ? (
                  // Show a loading indicator (Skeleton) while fetching
                  <div className="space-y-3"> {/* Reduced spacing */}
-                     <div className="flex justify-between items-center mb-3 space-x-2"> {/* Adjusted layout, reduced margin */}
+                      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2"> {/* Adjusted layout, reduced margin */}
                         {/* Skeleton for create button */}
-                        <Skeleton className="h-8 w-28 sm:w-[160px] rounded-md" /> {/* Adjusted size */}
-                        {/* Skeletons for view toggle buttons */}
-                         <div className='flex items-center space-x-1.5'> {/* Reduced spacing */}
-                           <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" /> {/* Adjusted size */}
-                           <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
-                         </div>
-                     </div>
+                         <Skeleton className="h-8 w-full sm:w-[160px] rounded-md" /> {/* Adjusted size */}
+                         {/* Skeletons for view toggle buttons */}
+                          <div className='flex items-center justify-end sm:justify-start space-x-1.5'> {/* Reduced spacing */}
+                            <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" /> {/* Adjusted size */}
+                            <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
+                          </div>
+                      </div>
                      {/* Skeleton for List View */}
                       <div className="rounded-lg border">
                           <Skeleton className="h-10 w-full rounded-t-md" /> {/* Adjusted Header size */}
@@ -108,7 +114,11 @@ export default function InvoicesPage() {
                  </div>
              ) : (
                  // Render the View Switcher once data/error state is resolved
-                 <InvoiceViewSwitcher invoices={invoices} fetchError={fetchError} />
+                 <InvoiceViewSwitcher
+                   invoices={invoices}
+                   fetchError={fetchError}
+                   onInvoiceDeleted={handleInvoiceDeleted} // Pass the delete handler
+                 />
              )}
 
         </CardContent>
@@ -116,3 +126,4 @@ export default function InvoicesPage() {
     </main>
   );
 }
+

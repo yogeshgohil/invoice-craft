@@ -12,25 +12,28 @@ import Link from 'next/link';
 interface InvoiceViewSwitcherProps {
   invoices: Invoice[];
   fetchError: string | null;
+  onInvoiceDeleted?: (invoiceId: string) => void; // Accept callback prop
 }
 
-export function InvoiceViewSwitcher({ invoices, fetchError }: InvoiceViewSwitcherProps) {
+export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted }: InvoiceViewSwitcherProps) {
   const [view, setView] = useState<'list' | 'grid'>('list'); // Default to list view
 
   return (
     <div>
        {/* Use flex-col on small screens, adjust spacing */}
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-4 gap-2">
-         {/* Create New Bill Button */}
-         <Link href="/invoices/new" passHref legacyBehavior>
-            {/* Use full width on mobile */}
-           <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-             <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create New Bill {/* Adjusted icon margin/size */}
-           </Button>
-         </Link>
+       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2"> {/* Adjusted layout, reduced margin */}
+          {/* Create Button and View Toggle Group */}
+         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch">
+            {/* Create New Bill Button */}
+            <Link href="/invoices/new" passHref legacyBehavior>
+              <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create New Bill {/* Adjusted icon margin/size */}
+              </Button>
+            </Link>
+         </div>
 
-         {/* View Toggle Buttons */}
-         <div className="flex items-center justify-end sm:justify-start"> {/* Align end on mobile */}
+         {/* View Toggle Buttons - Align end */}
+         <div className="flex items-center justify-end sm:justify-end"> {/* Align end */}
              <Button
                variant={view === 'list' ? 'default' : 'outline'}
                size="icon" // Use icon size for compact buttons
@@ -79,7 +82,7 @@ export function InvoiceViewSwitcher({ invoices, fetchError }: InvoiceViewSwitche
         ) : (
         // Render list or grid view
         view === 'list' ? (
-          <InvoiceList invoices={invoices} />
+          <InvoiceList invoices={invoices} onInvoiceDeleted={onInvoiceDeleted} /> // Pass delete handler
         ) : (
           // Pass invoices as initialInvoices to the grid component
           <InvoiceGrid initialInvoices={invoices} />
@@ -88,3 +91,4 @@ export function InvoiceViewSwitcher({ invoices, fetchError }: InvoiceViewSwitche
     </div>
   );
 }
+

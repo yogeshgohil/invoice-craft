@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react'; // Import useState
 import {
   Table,
   TableBody,
@@ -16,10 +17,23 @@ import type { Invoice } from '@/app/invoices/page'; // Import the Invoice type f
 import { format, parseISO } from 'date-fns'; // Use date-fns for reliable formatting
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Edit, Eye } from 'lucide-react'; // Import Eye icon
+import { Edit, Eye, Trash2, Loader2 } from 'lucide-react'; // Import Eye, Trash2, Loader2 icons
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"; // Import AlertDialog components
+import { useToast } from '@/hooks/use-toast'; // Import useToast
 
 interface InvoiceListProps {
   invoices: Invoice[];
+  onInvoiceDeleted?: (invoiceId: string) => void; // Add callback prop
 }
 
 // Helper function to format date (handles potential timezone issues and invalid dates)
@@ -63,7 +77,51 @@ const formatDate = (dateString: string | undefined | Date): string => {
  };
 
 
-export function InvoiceList({ invoices }: InvoiceListProps) {
+export function InvoiceList({ invoices, onInvoiceDeleted }: InvoiceListProps) {
+  const [isDeleting, setIsDeleting] = useState<string | null>(null); // Track deleting state for specific invoice
+  const { toast } = useToast();
+
+   const handleDeleteInvoice = async (invoiceId: string, invoiceNumber: string) => {
+      setIsDeleting(invoiceId); // Show loading state on the specific delete button
+
+      try {
+          const response = await fetch(`/api/invoices/${invoiceId}`, {
+              method: 'DELETE',
+          });
+
+          if (!response.ok) {
+             let errorMsg = `Failed to delete invoice #${invoiceNumber}.`;
+             try {
+                 const errorData = await response.json();
+                 errorMsg = errorData.message || `HTTP error! Status: ${response.status}`;
+             } catch (e) {
+                 errorMsg = `HTTP error deleting invoice ${invoiceId}! Status: ${response.status} ${response.statusText || ''}`.trim();
+             }
+             throw new Error(errorMsg);
+          }
+
+          toast({
+              title: "Invoice Deleted",
+              description: `Invoice #${invoiceNumber} has been successfully deleted.`,
+          });
+
+          // Call the callback function to update the parent component's state
+          if (onInvoiceDeleted) {
+              onInvoiceDeleted(invoiceId);
+          }
+
+      } catch (error: any) {
+          console.error("Error deleting invoice:", error);
+          toast({
+              title: "Deletion Failed",
+              description: error.message || `Could not delete invoice #${invoiceNumber}. Please try again.`,
+              variant: "destructive",
+          });
+      } finally {
+          setIsDeleting(null); // Stop loading state
+      }
+   };
+
 
   return (
     <div className="overflow-x-auto rounded-lg border"> {/* Added border and rounded corners */}
@@ -123,6 +181,43 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                              <Edit className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> {/* Smaller icon */}
                          </Button>
                      </Link>
+                      {/* Delete Button - Use AlertDialog for confirmation */}
+                     <AlertDialog>
+                       <AlertDialogTrigger asChild>
+                           <Button
+                             variant="ghost"
+                             size="icon"
+                             aria-label="Delete invoice"
+                             className="h-6 w-6 sm:h-7 sm:w-7 text-muted-foreground hover:text-destructive"
+                             disabled={isDeleting === invoice._id} // Disable while deleting this specific invoice
+                           >
+                             {isDeleting === invoice._id ? (
+                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                             ) : (
+                               <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                             )}
+                           </Button>
+                       </AlertDialogTrigger>
+                       <AlertDialogContent>
+                         <AlertDialogHeader>
+                           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                           <AlertDialogDescription>
+                             This action cannot be undone. This will permanently delete invoice
+                             <strong className="mx-1">{invoice.invoiceNumber}</strong>
+                             for customer <strong className="mx-1">{invoice.customerName}</strong>.
+                           </AlertDialogDescription>
+                         </AlertDialogHeader>
+                         <AlertDialogFooter>
+                           <AlertDialogCancel>Cancel</AlertDialogCancel>
+                           <AlertDialogAction
+                              onClick={() => handleDeleteInvoice(invoice._id, invoice.invoiceNumber)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90" // Destructive action style
+                            >
+                             Delete
+                           </AlertDialogAction>
+                         </AlertDialogFooter>
+                       </AlertDialogContent>
+                     </AlertDialog>
                  </TableCell>
               </TableRow>
              );
@@ -132,3 +227,4 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
     </div>
   );
 }
+

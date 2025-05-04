@@ -1,4 +1,5 @@
 
+
 import { NextResponse, type NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Invoice from '@/models/invoice';
@@ -203,5 +204,43 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
         const errorMessage = error instanceof Error ? error.message : 'Internal Server Error during status update.';
         return NextResponse.json({ message: 'Failed to update invoice status', error: errorMessage }, { status: 500 });
+    }
+}
+
+// DELETE handler to delete an invoice by ID
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+    const { id } = params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return NextResponse.json({ message: 'Invalid invoice ID format.' }, { status: 400 });
+    }
+
+    try {
+        await connectDB();
+        if (!isConnected()) {
+            throw new Error('Database connected but readyState is not 1.');
+        }
+
+        const deletedInvoice = await Invoice.findByIdAndDelete(id);
+
+        if (!deletedInvoice) {
+            return NextResponse.json({ message: 'Invoice not found.' }, { status: 404 });
+        }
+
+        // Return a success response with no content, or a success message
+        // return new Response(null, { status: 204 }); // No Content
+        return NextResponse.json({ message: 'Invoice deleted successfully.' }, { status: 200 }); // OK with message
+
+    } catch (error: any) {
+        if (error.message.toLowerCase().includes('database connection error') || error.name === 'MongooseServerSelectionError' || error.message.toLowerCase().includes('connection refused')) {
+            return NextResponse.json({ message: 'Database connection issue during delete.', error: error.name || 'DB Connection Error' }, { status: 503 });
+        }
+
+        if (error instanceof mongoose.Error) {
+            return NextResponse.json({ message: 'Database operation failed during delete.', error: error.message }, { status: 500 });
+        }
+
+        const errorMessage = error instanceof Error ? error.message : 'Internal Server Error during delete.';
+        return NextResponse.json({ message: 'Failed to delete invoice.', error: errorMessage }, { status: 500 });
     }
 }
