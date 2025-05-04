@@ -154,7 +154,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
       customerAddress: '',
       invoiceNumber: '', // Will be set by useEffect for new invoices
       invoiceDate: formatDateForInput(new Date()), // Default to today
-      dueDate: formatDateForInput(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)), // Default 30 days from now
+      dueDate: formatDateForInput(new Date()), // Default to today
       items: [{ description: '', quantity: 1, price: 0, color: '#000000' }], // Add default color
       notes: '',
       paidAmount: 0,
@@ -399,13 +399,13 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
   // Render skeleton or minimal UI if not client-side yet (important for date fields)
    if (!isClient) {
        return (
-           <div className="space-y-4 sm:space-y-6 p-4"> {/* Use smaller padding on mobile */}
+           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6"> {/* Use smaller padding on mobile */}
                {/* Placeholder cards */}
-               <Card className="bg-card animate-pulse"><CardHeader className="p-4"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 pt-0 space-y-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-20 bg-muted rounded" /></CardContent></Card>
-               <Card className="bg-card animate-pulse"><CardHeader className="p-4"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 pt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /></CardContent></Card>
-               <Card className="bg-card animate-pulse"><CardHeader className="p-4"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 pt-0 space-y-4"><Skeleton className="h-20 bg-muted rounded" /><Skeleton className="h-10 w-32 bg-muted rounded" /></CardContent></Card>
+               <Card className="bg-card animate-pulse"><CardHeader className="p-4 sm:p-6"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 sm:p-6 pt-0 space-y-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-20 bg-muted rounded" /></CardContent></Card>
+               <Card className="bg-card animate-pulse"><CardHeader className="p-4 sm:p-6"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 sm:p-6 pt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /></CardContent></Card>
+               <Card className="bg-card animate-pulse"><CardHeader className="p-4 sm:p-6"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 sm:p-6 pt-0 space-y-4"><Skeleton className="h-20 bg-muted rounded" /><Skeleton className="h-10 w-32 bg-muted rounded" /></CardContent></Card>
                {/* Add more placeholders as needed */}
-                <CardFooter className="flex flex-col gap-2 pt-6 px-4"> {/* Stack buttons vertically */}
+                <CardFooter className="flex flex-col gap-2 pt-6 px-4 sm:px-6"> {/* Stack buttons vertically */}
                     <Skeleton className="h-9 w-full bg-muted rounded-md" />
                     <Skeleton className="h-9 w-full bg-muted rounded-md" />
                     <Skeleton className="h-9 w-full bg-muted rounded-md" />
@@ -502,7 +502,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
                                                 <FormMessage className="text-xs" />
                                             </FormItem>
                                         )} />
-                                        <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove item" disabled={fields.length <= 1} className="w-6 h-6 sm:w-7 sm:w-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive self-center"> {/* Smaller button */}
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove item" disabled={fields.length <= 1} className="w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive self-center"> {/* Smaller button */}
                                             <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                         </Button>
                                      </div>
@@ -670,3 +670,4 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
     </Form>
   );
 }
+
