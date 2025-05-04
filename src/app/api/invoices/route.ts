@@ -8,6 +8,10 @@ import mongoose, { type FilterQuery } from 'mongoose'; // Import FilterQuery typ
 // Helper function to check DB connection state
 const isConnected = () => mongoose.connection.readyState === 1;
 
+// Default pagination values
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10; // Number of invoices per page
+
 // POST handler to save an invoice
 export async function POST(request: Request) {
   try {
@@ -37,6 +41,12 @@ export async function POST(request: Request) {
     if (isNaN(parsedInvoiceDate.getTime()) || isNaN(parsedDueDate.getTime())) {
          return NextResponse.json({ message: 'Invalid date format provided. Use YYYY-MM-DD.' }, { status: 400 });
     }
+
+     // Validate dueDate is not before invoiceDate
+     if (parsedDueDate < parsedInvoiceDate) {
+        return NextResponse.json({ message: 'Due date cannot be before invoice date.' }, { status: 400 });
+     }
+
 
     // Create a new invoice document using the Mongoose model
     const newInvoice = new Invoice({
@@ -92,7 +102,7 @@ export async function POST(request: Request) {
   }
 }
 
-// GET handler to retrieve invoices with filtering
+// GET handler to retrieve invoices with filtering and pagination
 export async function GET(request: NextRequest) { // Use NextRequest to access searchParams
   try {
      // Attempt to connect to the database first
@@ -117,6 +127,14 @@ export async function GET(request: NextRequest) { // Use NextRequest to access s
     const status = searchParams.get('status');
     const dueDateStart = searchParams.get('dueDateStart');
     const dueDateEnd = searchParams.get('dueDateEnd');
+    const page = parseInt(searchParams.get('page') || `${DEFAULT_PAGE}`, 10);
+    const limit = parseInt(searchParams.get('limit') || `${DEFAULT_LIMIT}`, 10);
+
+    // Validate page and limit
+    const pageNumber = Math.max(1, page); // Ensure page is at least 1
+    const limitNumber = Math.max(1, Math.min(50, limit)); // Ensure limit is between 1 and 50 (or your preferred max)
+    const skip = (pageNumber - 1) * limitNumber;
+
 
     // Build the MongoDB query object based on filters
     const query: FilterQuery<InvoiceFormData & Document> = {};
@@ -155,12 +173,27 @@ export async function GET(request: NextRequest) { // Use NextRequest to access s
         query.dueDate = dueDateQuery;
     }
 
+    // Fetch total count for pagination info
+    const totalInvoices = await Invoice.countDocuments(query);
 
-    // Fetch invoices from the database based on the query, sorting by invoiceDate descending
-    const invoices = await Invoice.find(query).sort({ invoiceDate: -1 });
+    // Fetch invoices from the database based on the query, sorting by invoiceDate descending, applying pagination
+    const invoices = await Invoice.find(query)
+                                   .sort({ invoiceDate: -1 })
+                                   .skip(skip)
+                                   .limit(limitNumber);
 
+    // Calculate total pages
+    const totalPages = Math.ceil(totalInvoices / limitNumber);
 
-    return NextResponse.json({ invoices }, { status: 200 });
+    return NextResponse.json({
+        invoices,
+        pagination: {
+            currentPage: pageNumber,
+            totalPages,
+            totalInvoices,
+            limit: limitNumber,
+        }
+     }, { status: 200 });
 
   } catch (error: any) {
 

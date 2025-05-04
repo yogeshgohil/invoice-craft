@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState } from 'react'; // Import useState
+// Removed useState import as it's no longer needed here
+
 import {
   Table,
   TableBody,
@@ -14,7 +15,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency, cn } from '@/lib/utils';
 import type { Invoice } from '@/app/invoices/page'; // Import the Invoice type from page.tsx
-import { format, parseISO } from 'date-fns'; // Use date-fns for reliable formatting
+import { format, parseISO, isValid } from 'date-fns'; // Use date-fns for reliable formatting
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Edit, Eye, Trash2, Loader2 } from 'lucide-react'; // Import Eye, Trash2, Loader2 icons
@@ -30,6 +31,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"; // Import AlertDialog components
 import { useToast } from '@/hooks/use-toast'; // Import useToast
+import { useState } from 'react'; // Keep useState for isDeleting
 
 interface InvoiceListProps {
   invoices: Invoice[];
@@ -40,13 +42,11 @@ interface InvoiceListProps {
 const formatDate = (dateString: string | undefined | Date): string => {
     if (!dateString) return 'N/A';
     try {
-        // Prefer parsing ISO string if available, otherwise treat as Date object or YYYY-MM-DD string
         const date = typeof dateString === 'string' ? parseISO(dateString) : dateString;
-         if (isNaN(date.getTime())) { // Check if date is valid after ISO parsing
-            // Fallback: try parsing YYYY-MM-DD, assuming UTC
+         if (!isValid(date)) { // Check if date is valid after ISO parsing
              const manualDate = new Date(dateString + 'T00:00:00Z');
-             if (isNaN(manualDate.getTime())) return 'Invalid Date';
-             return format(manualDate, 'MMM d, yyyy'); // Format: Jul 15, 2024
+             if (!isValid(manualDate)) return 'Invalid Date';
+             return format(manualDate, 'MMM d, yyyy');
          }
         return format(date, 'MMM d, yyyy'); // Format: Jul 15, 2024
     } catch (e) {
@@ -103,6 +103,7 @@ export function InvoiceList({ invoices, onInvoiceDeleted }: InvoiceListProps) {
           toast({
               title: "Invoice Deleted",
               description: `Invoice #${invoiceNumber} has been successfully deleted.`,
+              duration: 3000, // Shorter duration for success
           });
 
           // Call the callback function to update the parent component's state
@@ -127,7 +128,8 @@ export function InvoiceList({ invoices, onInvoiceDeleted }: InvoiceListProps) {
     <div className="overflow-x-auto rounded-lg border"> {/* Added border and rounded corners */}
       <Table>
         <TableCaption className="text-xs py-3"> {/* Adjusted padding and size */}
-            A list of your invoices {invoices.length > 0 ? `(${invoices.length} found)` : ''}.
+            {invoices.length > 0 ? `Showing ${invoices.length} invoices.` : 'No invoices to display.'}
+            {/* Removed total count as it's handled by pagination */}
         </TableCaption>
         <TableHeader>
           {/* Adjust table head padding and potentially hide columns on small screens if needed */}
@@ -227,4 +229,3 @@ export function InvoiceList({ invoices, onInvoiceDeleted }: InvoiceListProps) {
     </div>
   );
 }
-

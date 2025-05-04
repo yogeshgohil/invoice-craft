@@ -7,16 +7,32 @@ interface FilterParams {
     status?: string;
     dueDateStart?: string;
     dueDateEnd?: string;
+    page?: number; // Add page number
+    limit?: number; // Add limit per page
 }
 
-// Function to fetch multiple invoices with optional filters
-export async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
+// Define the structure of the API response including pagination
+interface FetchInvoicesResponse {
+    invoices: Invoice[];
+    pagination: {
+        currentPage: number;
+        totalPages: number;
+        totalInvoices: number;
+        limit: number;
+    };
+}
+
+
+// Function to fetch multiple invoices with optional filters and pagination
+export async function fetchInvoices(filters: FilterParams): Promise<FetchInvoicesResponse> {
     // Use relative URL directly in client components
     const queryParams = new URLSearchParams();
     if (filters.customerName) queryParams.append('customerName', filters.customerName);
     if (filters.status) queryParams.append('status', filters.status);
     if (filters.dueDateStart) queryParams.append('dueDateStart', filters.dueDateStart);
     if (filters.dueDateEnd) queryParams.append('dueDateEnd', filters.dueDateEnd);
+    if (filters.page) queryParams.append('page', filters.page.toString());
+    if (filters.limit) queryParams.append('limit', filters.limit.toString());
 
     const apiUrl = `/api/invoices?${queryParams.toString()}`; // Use relative URL
 
@@ -24,8 +40,7 @@ export async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
-            // Consider cache strategy for lists: 'no-store' for always fresh,
-            // or remove for default caching behavior.
+            // Cache strategy: 'no-store' for always fresh data needed for lists that change often
             cache: 'no-store',
         });
 
@@ -41,15 +56,23 @@ export async function fetchInvoices(filters: FilterParams): Promise<Invoice[]> {
         }
 
         const data = await response.json();
-        if (!data || !Array.isArray(data.invoices)) {
+        if (!data || !Array.isArray(data.invoices) || !data.pagination) {
             throw new Error('Invalid data structure received from API.');
         }
         // Ensure dates are Dates or strings as needed by consumers
-        return data.invoices.map((invoice: any) => ({
+        // Convert dates from API (likely strings) to Date objects if required by components
+        const formattedInvoices = data.invoices.map((invoice: any) => ({
             ...invoice,
-            invoiceDate: invoice.invoiceDate, // Keep as string from API for consistency? Or parse?
-            dueDate: invoice.dueDate,         // Decide based on usage
+            // Example: Convert to Date objects if needed elsewhere, otherwise keep as string
+            // invoiceDate: new Date(invoice.invoiceDate),
+            // dueDate: new Date(invoice.dueDate),
         })) as Invoice[];
+
+        return {
+            invoices: formattedInvoices,
+            pagination: data.pagination,
+        };
+
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         throw new Error(`Failed to load invoices. Please check the API connection or try again later. Original error: ${errorMessage}`);
