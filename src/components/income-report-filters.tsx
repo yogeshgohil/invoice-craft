@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,6 +12,7 @@ import { format, isValid, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 interface IncomeReportFiltersProps {
   initialStartDate: string;
@@ -142,3 +144,4 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
      </div>
   );
 }
+
