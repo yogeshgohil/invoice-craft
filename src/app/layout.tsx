@@ -8,6 +8,7 @@ import { SidebarNav } from '@/components/sidebar-nav'; // Import the SidebarNav
 import { MobileNav } from '@/components/mobile-nav'; // Import the new MobileNav
 import { useIsMobile } from '@/hooks/use-mobile'; // Import useIsMobile hook
 import { Suspense } from 'react'; // Import Suspense for loading boundary
+import type { ReactNode } from 'react'; // Import ReactNode
 
 export const metadata: Metadata = {
   title: 'Create Bill', // Update title
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 // Add 'use client' because this component uses the useIsMobile hook
-function LayoutContent({ children }: { children: React.ReactNode }) {
+function LayoutContent({ children }: { children: ReactNode }) {
   'use client'; // <-- Add this directive
 
   const isMobile = useIsMobile();
@@ -43,7 +44,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -61,3 +62,4 @@ export default function RootLayout({
     </html>
   );
 }
+
