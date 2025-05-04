@@ -8,14 +8,13 @@ import {
   SidebarHeader,
   SidebarContent,
   SidebarFooter,
-  SidebarTrigger, // Import SidebarTrigger
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { FileText, BarChart3, LogOut, PanelLeft } from 'lucide-react'; // Added icons, PanelLeft for trigger
+import { FileText, BarChart3, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context'; // Import useAuth
 import { cn } from '@/lib/utils'; // Import cn for conditional classes
@@ -57,8 +56,7 @@ export function SidebarNav() {
                {/* Conditionally render title based on state */}
                <h2 className={cn("font-semibold text-lg text-foreground whitespace-nowrap overflow-hidden transition-opacity duration-200", state === 'collapsed' ? 'opacity-0 w-0' : 'opacity-100 w-auto')}>Mahakali</h2> {/* Changed title */}
            </div>
-           {/* Sidebar Trigger for Mobile - Visible only on mobile */}
-            <SidebarTrigger className="md:hidden" />
+           {/* Sidebar Trigger for Mobile is removed as it's handled by MobileNav */}
         </div>
       </SidebarHeader>
 
@@ -122,6 +120,3 @@ export function SidebarNav() {
     </Sidebar>
   );
 }
-
-
-    

@@ -1,18 +1,43 @@
 
 import type { Metadata } from 'next';
-// Removed Geist font imports: import { Geist_Sans, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster'; // Import Toaster
 import { AuthProvider } from '@/contexts/auth-context'; // Import AuthProvider
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'; // Import Sidebar components
-import { SidebarNav } from '@/components/sidebar-nav'; // Import the new SidebarNav
-
-// Removed Geist font instantiations
+import { SidebarNav } from '@/components/sidebar-nav'; // Import the SidebarNav
+import { MobileNav } from '@/components/mobile-nav'; // Import the new MobileNav
+import { useIsMobile } from '@/hooks/use-mobile'; // Import useIsMobile hook
+import { Suspense } from 'react'; // Import Suspense for loading boundary
 
 export const metadata: Metadata = {
   title: 'Create Bill', // Update title
   description: 'Generate and manage invoices easily.', // Update description
 };
+
+// Add 'use client' because this component uses the useIsMobile hook
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  'use client'; // <-- Add this directive
+
+  const isMobile = useIsMobile();
+
+  // While isMobile is undefined (during SSR or initial client render), show a loading state or nothing
+  if (isMobile === undefined) {
+     // You could return a loading skeleton or null here
+     // Returning null might be better to avoid layout shifts
+     return null;
+  }
+
+  return (
+    <SidebarProvider defaultOpen={false}> {/* Default to collapsed */}
+      {isMobile ? <MobileNav /> : <SidebarNav />} {/* Conditional Rendering */}
+      <SidebarInset> {/* Wrap the main content */}
+        {children}
+      </SidebarInset>
+      <Toaster /> {/* Add Toaster here */}
+    </SidebarProvider>
+  );
+}
+
 
 export default function RootLayout({
   children,
@@ -22,21 +47,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        // Removed font variables from className
         className="antialiased" // Use default Tailwind fonts
         suppressHydrationWarning // Add suppression here for body tag modifications
       >
         <AuthProvider> {/* Wrap children with AuthProvider */}
-          <SidebarProvider defaultOpen={false}> {/* Default to collapsed */}
-            <SidebarNav /> {/* Add the Sidebar */}
-            <SidebarInset> {/* Wrap the main content */}
-              {children}
-            </SidebarInset>
-            <Toaster /> {/* Add Toaster here */}
-          </SidebarProvider>
+           {/* Wrap LayoutContent in Suspense to handle the initial undefined state of isMobile */}
+           <Suspense fallback={<div>Loading...</div>}>
+               <LayoutContent>{children}</LayoutContent> {/* Use the wrapper component */}
+           </Suspense>
         </AuthProvider>
       </body>
     </html>
   );
 }
-
