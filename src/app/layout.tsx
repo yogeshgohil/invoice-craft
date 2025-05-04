@@ -27,7 +27,7 @@ export default function RootLayout({
         suppressHydrationWarning // Add suppression here for body tag modifications
       >
         <AuthProvider> {/* Wrap children with AuthProvider */}
-          <SidebarProvider defaultOpen={true}> {/* Wrap with SidebarProvider */}
+          <SidebarProvider defaultOpen={false}> {/* Default to collapsed */}
             <SidebarNav /> {/* Add the Sidebar */}
             <SidebarInset> {/* Wrap the main content */}
               {children}

@@ -15,7 +15,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { FileText, BarChart3, LogOut, Settings, User } from 'lucide-react'; // Added icons
+import { FileText, BarChart3, LogOut } from 'lucide-react'; // Added icons
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context'; // Import useAuth
 import { cn } from '@/lib/utils'; // Import cn for conditional classes
@@ -119,3 +119,4 @@ export function SidebarNav() {
     </Sidebar>
   );
 }
+

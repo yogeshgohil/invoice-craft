@@ -73,7 +73,17 @@ const SidebarProvider = React.forwardRef<
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = React.useState(defaultOpen)
+    const [_open, _setOpen] = React.useState(() => {
+      if (typeof window !== 'undefined') {
+          const cookieValue = document.cookie
+            .split('; ')
+            .find((row) => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
+            ?.split('=')[1];
+          return cookieValue === 'true' ? true : (cookieValue === 'false' ? false : defaultOpen);
+      }
+      return defaultOpen;
+    })
+
     const open = openProp ?? _open
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
@@ -85,10 +95,9 @@ const SidebarProvider = React.forwardRef<
         }
 
         // This sets the cookie to keep the sidebar state.
-        // Only set cookie on explicit toggle, not on hover for desktop
-        // if (isMobile || !document.body.matches(':hover')) { // A potential check, but complex
-             document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
-        // }
+        if (typeof window !== 'undefined') {
+            document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        }
       },
       [setOpenProp, open]
     )
@@ -179,24 +188,41 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, open, setOpen, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, setOpen, openMobile, setOpenMobile } = useSidebar()
+    const [isHovering, setIsHovering] = React.useState(false);
 
     const handleMouseEnter = () => {
         // Only expand on hover if collapsed and not mobile
-        if (!isMobile && state === 'collapsed') {
+        if (!isMobile && state === 'collapsed' && collapsible === 'icon') {
+            setIsHovering(true);
             setOpen(true);
         }
     };
 
     const handleMouseLeave = () => {
-        // Only collapse on mouse leave if expanded and not mobile
-         if (!isMobile && state === 'expanded') {
-             // We need a way to differentiate between hover-triggered expansion
-             // and click-triggered expansion. For simplicity, this will always
-             // collapse on leave if expanded. A more complex solution could
-             // track the trigger source.
+        // Only collapse on mouse leave if expanded due to hover and not mobile
+         if (!isMobile && state === 'expanded' && isHovering && collapsible === 'icon') {
+             setIsHovering(false);
              setOpen(false);
+         } else if (state === 'expanded' && !isHovering && collapsible === 'icon') {
+             // Ensure hover state is false if mouse leaves while pinned open
+             setIsHovering(false);
          }
+    };
+
+    const handlePin = () => {
+        if (isHovering) {
+            setIsHovering(false); // Pin it open by clearing hover state
+             if (typeof window !== 'undefined') {
+                 document.cookie = `${SIDEBAR_COOKIE_NAME}=true; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+             }
+        } else {
+            // If already pinned, collapse it and update cookie
+            setOpen(false);
+             if (typeof window !== 'undefined') {
+                 document.cookie = `${SIDEBAR_COOKIE_NAME}=false; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+             }
+        }
     };
 
 
@@ -275,6 +301,23 @@ const Sidebar = React.forwardRef<
             data-sidebar="sidebar"
             className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow overflow-hidden" // Add overflow-hidden
           >
+            {/* Optional Pin Button */}
+            {collapsible === 'icon' && (
+                 <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 z-20 h-6 w-6 opacity-0 group-hover/sidebar-wrapper:opacity-100 transition-opacity"
+                    onClick={handlePin}
+                    aria-label={state === 'expanded' && !isHovering ? 'Unpin Sidebar' : 'Pin Sidebar'}
+                 >
+                    {/* Use a pin icon - requires adding a pin icon component or SVG */}
+                    {/* <Pin className={cn('h-4 w-4', state === 'expanded' && !isHovering && 'rotate-45')} /> */}
+                      {/* Placeholder icon */}
+                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" className={cn(state === 'expanded' && !isHovering && 'rotate-45')}>
+                          <path d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5c0 .276-.224.5-.5.5s-.5-.224-.5-.5V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.176A4.5 4.5 0 0 1 5 6.97V2.54c-.104-.074-.228-.173-.354-.298C4.342 1.99 4 1.506 4 .854a.5.5 0 0 1 .146-.354M6 1.5v5.176l-.106.06A5.5 5.5 0 0 0 5.223 7.83C4.7 8.27 4 8.976 4 9.5h4V1.5z"/>
+                       </svg>
+                 </Button>
+             )}
             {children}
           </div>
         </div>
@@ -349,10 +392,11 @@ const SidebarInset = React.forwardRef<
     <main
       ref={ref}
       className={cn(
-        "relative flex min-h-svh flex-1 flex-col bg-background transition-[margin-left] duration-200 ease-linear", // Add transition
+        "relative flex min-h-svh flex-1 flex-col bg-background transition-[margin-left] duration-200 ease-linear md:!duration-100 md:!ease-in", // Adjusted transition for faster desktop collapse
         // Adjust margin based on sidebar state for desktop
-        !isMobile && state === 'expanded' && "ml-[--sidebar-width]",
-        !isMobile && state === 'collapsed' && "ml-[--sidebar-width-icon]",
+        !isMobile && state === 'expanded' && "md:ml-[--sidebar-width]",
+        !isMobile && state === 'collapsed' && "md:ml-[--sidebar-width-icon]",
+        // Apply inset styling
         "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
         className
       )}
@@ -607,7 +651,6 @@ const SidebarMenuButton = React.forwardRef<
      // Filter out null children (important for React.Children.only when asChild is true)
      const finalChildren = React.Children.toArray(processedChildren).filter(Boolean);
 
-
     const buttonContent = (
       <Comp
         ref={ref}
@@ -617,7 +660,7 @@ const SidebarMenuButton = React.forwardRef<
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
       >
-          {finalChildren}
+          {asChild && finalChildren.length === 1 ? React.Children.only(finalChildren[0]) : finalChildren}
       </Comp>
     );
 
