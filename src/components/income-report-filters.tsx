@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,15 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarIcon, FilterX, Filter } from 'lucide-react'; // Added Filter icon
-import { format, isValid, parseISO, startOfMonth, endOfMonth } from 'date-fns';
+import { format, isValid, parse, startOfMonth, endOfMonth } from 'date-fns'; // Import parse
 import { cn } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface IncomeReportFiltersProps {
-  initialStartDate: string;
-  initialEndDate: string;
+  initialStartDate: string; // Expect YYYY-MM-DD
+  initialEndDate: string;   // Expect YYYY-MM-DD
 }
 
 export function IncomeReportFilters({ initialStartDate, initialEndDate }: IncomeReportFiltersProps) {
@@ -23,42 +22,48 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
   const searchParams = useSearchParams();
   const [isClient, setIsClient] = useState(false);
 
-  // Parse initial dates safely, falling back to current month if invalid/missing
-  const parseDate = (dateStr: string | null | undefined, fallback: Date): Date => {
-    if (!dateStr) return fallback;
-    try {
-      const parsed = parseISO(dateStr);
-      return isValid(parsed) ? parsed : fallback;
-    } catch {
-      return fallback;
-    }
+  // Helper to parse YYYY-MM-DD string to Date, falling back gracefully
+  const parseDateString = (dateStr: string | null | undefined, fallbackDate: Date): Date => {
+      if (dateStr) {
+          const parsed = parse(dateStr, 'yyyy-MM-dd', new Date());
+          if (isValid(parsed)) {
+              return parsed;
+          }
+      }
+      return fallbackDate;
   };
 
   const defaultStart = startOfMonth(new Date());
   const defaultEnd = endOfMonth(new Date());
 
-  // Initialize state with URL params or current month defaults
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => ({
-      from: parseDate(searchParams.get('startDate'), defaultStart),
-      to: parseDate(searchParams.get('endDate'), defaultEnd),
-  }));
+  // Initialize state based on props (which reflect URL or defaults from page)
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+      const fromDate = parseDateString(initialStartDate, defaultStart);
+      const toDate = parseDateString(initialEndDate, defaultEnd);
+      // Ensure 'to' is not before 'from' if parsing fails weirdly
+      return {
+          from: fromDate,
+          to: toDate >= fromDate ? toDate : endOfMonth(fromDate),
+      };
+  });
 
   useEffect(() => {
       setIsClient(true);
-      // Sync state with URL params on mount if they exist
+      // Sync state with URL params *if they differ from initial props*
+      // This handles cases where the user navigates back/forward
       const urlStartDate = searchParams.get('startDate');
       const urlEndDate = searchParams.get('endDate');
-      if (urlStartDate || urlEndDate) {
-         setDateRange({
-            from: parseDate(urlStartDate, defaultStart),
-            to: parseDate(urlEndDate, defaultEnd),
-         });
-      } else {
-         // If no URL params, ensure state reflects default current month
-         setDateRange({ from: defaultStart, to: defaultEnd });
+
+      if (urlStartDate !== initialStartDate || urlEndDate !== initialEndDate) {
+           const fromDate = parseDateString(urlStartDate, defaultStart);
+           const toDate = parseDateString(urlEndDate, defaultEnd);
+           setDateRange({
+               from: fromDate,
+               to: toDate >= fromDate ? toDate : endOfMonth(fromDate),
+           });
       }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once on mount
+  }, [searchParams, initialStartDate, initialEndDate]); // Rerun if props or searchParams change
 
   // Handler for date selection change (updates state only)
   const handleDateChange = (range: DateRange | undefined) => {
@@ -69,13 +74,14 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
   const handleFilterApply = () => {
     const current = new URLSearchParams(); // Start fresh
 
-    if (dateRange?.from) {
+    // Format dates back to YYYY-MM-DD for URL parameters
+    if (dateRange?.from && isValid(dateRange.from)) {
       current.set('startDate', format(startOfMonth(dateRange.from), 'yyyy-MM-dd'));
     }
-    if (dateRange?.to) {
+    if (dateRange?.to && isValid(dateRange.to)) {
       // Use end of the selected month for the 'to' date
       current.set('endDate', format(endOfMonth(dateRange.to), 'yyyy-MM-dd'));
-    } else if (dateRange?.from) {
+    } else if (dateRange?.from && isValid(dateRange.from)) {
         // Default 'to' to end of 'from' month if only 'from' is selected
        current.set('endDate', format(endOfMonth(dateRange.from), 'yyyy-MM-dd'));
     }
@@ -89,11 +95,11 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
    const clearFilters = () => {
       // Reset state to current month defaults
       setDateRange({ from: defaultStart, to: defaultEnd });
-      // Navigate to base URL to reflect default state in URL too
+      // Navigate to base URL to clear URL params
       router.push('/reports/income', { scroll: false });
    };
 
-   // Prevent rendering on server to avoid hydration mismatches with Date
+   // Prevent rendering date-dependent UI on server
    if (!isClient) {
       return (
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 mb-4">
@@ -107,6 +113,9 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
       );
    }
 
+   const displayFrom = dateRange?.from && isValid(dateRange.from) ? format(dateRange.from, "LLL dd, y") : '';
+   const displayTo = dateRange?.to && isValid(dateRange.to) ? format(dateRange.to, "LLL dd, y") : '';
+
   return (
      <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 mb-4">
        <div className="grid gap-2 w-full sm:w-auto">
@@ -118,18 +127,17 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
                variant={"outline"}
                className={cn(
                  "w-full sm:w-[300px] justify-start text-left font-normal",
-                 !dateRange?.from && "text-muted-foreground" // Adjust condition slightly
+                 !dateRange?.from && "text-muted-foreground"
                )}
              >
                <CalendarIcon className="mr-2 h-4 w-4" />
-               {dateRange?.from ? (
-                 dateRange.to ? (
+               {displayFrom ? (
+                 displayTo ? (
                    <>
-                     {format(dateRange.from, "LLL dd, y")} -{" "}
-                     {format(dateRange.to, "LLL dd, y")}
+                     {displayFrom} - {displayTo}
                    </>
                  ) : (
-                   format(dateRange.from, "LLL dd, y")
+                   displayFrom
                  )
                ) : (
                  <span>Pick a date range</span>
@@ -140,8 +148,9 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
              <Calendar
                initialFocus
                mode="range"
-               defaultMonth={dateRange?.from || new Date()}
-               selected={dateRange}
+               // Use valid dates for defaultMonth, selected
+               defaultMonth={dateRange?.from && isValid(dateRange.from) ? dateRange.from : defaultStart}
+               selected={dateRange?.from && isValid(dateRange.from) ? dateRange : { from: defaultStart, to: defaultEnd }}
                onSelect={handleDateChange} // Update state on select
                numberOfMonths={2}
              />
@@ -153,7 +162,8 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
            onClick={handleFilterApply}
            size="sm"
            className="w-full sm:w-auto" // Full width on mobile
-           disabled={!dateRange?.from} // Disable if no start date selected
+           // Disable if 'from' date is missing or invalid
+           disabled={!dateRange?.from || !isValid(dateRange.from)}
         >
             <Filter className="mr-2 h-4 w-4" /> Apply Filter
         </Button>
@@ -163,11 +173,15 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
             size="sm"
             onClick={clearFilters}
             className="w-full sm:w-auto" // Full width on mobile
-            disabled={!dateRange?.from && !dateRange?.to && !searchParams.get('startDate') && !searchParams.get('endDate')} // Disable if no dates selected AND no params in URL
+            // Disable if state reflects default AND no params in URL
+            disabled={
+                dateRange?.from?.getTime() === defaultStart.getTime() &&
+                dateRange?.to?.getTime() === defaultEnd.getTime() &&
+                !searchParams.get('startDate') && !searchParams.get('endDate')
+            }
         >
             <FilterX className="mr-2 h-4 w-4" /> Clear Range
         </Button>
      </div>
   );
 }
-
