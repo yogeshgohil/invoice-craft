@@ -11,7 +11,7 @@ import { formatCurrency } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, IndianRupee, TrendingDown, TrendingUp } from 'lucide-react'; // Added relevant icons
-import { format as formatDateFns, isValid, parseISO } from 'date-fns'; // Renamed 'format' to avoid conflict
+import { format as formatDateFns, isValid, parseISO, startOfMonth, endOfMonth } from 'date-fns'; // Renamed 'format' to avoid conflict, added date helpers
 
 // Wrapper Component to use useSearchParams
 function IncomeReportContent() {
@@ -175,7 +175,7 @@ function IncomeReportContent() {
                 </CardContent>
             </Card>
         </main>
-    ); // <-- Closing parenthesis for the return statement
+    );
 }
 
 
