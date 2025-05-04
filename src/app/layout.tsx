@@ -1,15 +1,13 @@
 
 import type { Metadata } from 'next';
-import { Geist } from 'next/font/google'; // Keep Geist Sans only if needed
+// Removed Geist font imports: import { Geist_Sans, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster'; // Import Toaster
 import { AuthProvider } from '@/contexts/auth-context'; // Import AuthProvider
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'; // Import Sidebar components
+import { SidebarNav } from '@/components/sidebar-nav'; // Import the new SidebarNav
 
-// Use Geist Sans if specifically desired, otherwise remove font imports
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
+// Removed Geist font instantiations
 
 export const metadata: Metadata = {
   title: 'Create Bill', // Update title
@@ -22,21 +20,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      {/*
-        Added suppressHydrationWarning to the body tag.
-        This can help ignore hydration mismatches caused by browser extensions.
-      */}
+    <html lang="en" suppressHydrationWarning>
       <body
-        // Apply font variable if using Geist Sans, otherwise use default Tailwind fonts
-        className={`${geistSans.variable} antialiased`}
-        suppressHydrationWarning={true}
+        // Removed font variables from className
+        className="antialiased" // Use default Tailwind fonts
       >
         <AuthProvider> {/* Wrap children with AuthProvider */}
-           {children}
-           <Toaster /> {/* Add Toaster here */}
-         </AuthProvider>
+          <SidebarProvider defaultOpen={true}> {/* Wrap with SidebarProvider */}
+            <SidebarNav /> {/* Add the Sidebar */}
+            <SidebarInset> {/* Wrap the main content */}
+              {children}
+            </SidebarInset>
+            <Toaster /> {/* Add Toaster here */}
+          </SidebarProvider>
+        </AuthProvider>
       </body>
     </html>
   );
 }
+

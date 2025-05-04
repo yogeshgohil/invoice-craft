@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { List, LayoutGrid, PlusCircle, LineChart } from 'lucide-react'; // Added PlusCircle & LineChart
+import { List, LayoutGrid, PlusCircle } from 'lucide-react'; // Removed LineChart
 import { InvoiceList } from './invoice-list';
 import { InvoiceGrid } from './invoice-grid'; // Import the new grid component
 import type { Invoice } from '@/app/invoices/page'; // Import the Invoice type
@@ -23,19 +23,14 @@ export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted }: 
        {/* Use flex-col on small screens, adjust spacing */}
        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2"> {/* Adjusted layout, reduced margin */}
           {/* Create Button and View Toggle Group */}
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch"> {/* Group buttons */}
+           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch"> {/* Group buttons */}
               {/* Create New Bill Button */}
               <Link href="/invoices/new" passHref legacyBehavior>
                   <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
                       <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create New Bill {/* Adjusted icon margin/size */}
                   </Button>
               </Link>
-              {/* Income Report Button */}
-              <Link href="/reports/income" passHref legacyBehavior>
-                   <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                       <LineChart className="mr-1.5 h-3.5 w-3.5" /> Income Report
-                   </Button>
-              </Link>
+              {/* REMOVED Income Report Button */}
           </div>
 
 
@@ -67,15 +62,12 @@ export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted }: 
          <div className="text-center text-destructive py-4 sm:py-8 px-3 rounded-md border border-destructive/50 bg-destructive/10"> {/* Reduced padding */}
             <p className="font-semibold text-sm sm:text-base mb-1">Error loading invoices</p> {/* Smaller text, reduced margin */}
             <p className="text-[10px] sm:text-xs">{fetchError}</p> {/* Smaller text */}
-            {fetchError.includes("NEXT_PUBLIC_APP_URL") && (
+            {fetchError.includes("Failed to fetch") && (
                 <p className="mt-1.5 sm:mt-2 text-[10px] text-destructive/80"> {/* Reduced margin/size */}
-                  Please ensure the <code className="bg-destructive/20 px-1 py-0.5 rounded text-[10px]">NEXT_PUBLIC_APP_URL</code> environment variable is correctly set in your <code className="bg-destructive/20 px-1 py-0.5 rounded text-[10px]">.env.local</code> file or deployment settings. Restart your dev server after changes.
+                  Please ensure the API server is running and accessible. Check network connection and API endpoint URLs.
                 </p>
             )}
-            {fetchError.includes("Failed to construct valid API URL") && (
-                <p className="mt-1.5 sm:mt-2 text-[10px] text-destructive/80">The base URL provided by <code className="bg-destructive/20 px-1 py-0.5 rounded text-[10px]">NEXT_PUBLIC_APP_URL</code> seems incorrect. Please verify it.</p>
-            )}
-             {!fetchError.includes("NEXT_PUBLIC_APP_URL") && !fetchError.includes("Failed to construct valid API URL") && (
+             {!fetchError.includes("Failed to fetch") && (
                 <p className="mt-2 sm:mt-3 text-[10px] sm:text-xs text-muted-foreground">Please try refreshing the page or check the server logs for more details.</p>
             )}
           </div>
