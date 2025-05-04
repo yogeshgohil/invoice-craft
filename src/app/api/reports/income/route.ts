@@ -3,27 +3,31 @@ import { NextResponse, type NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Invoice from '@/models/invoice';
 import mongoose from 'mongoose';
-import { startOfMonth, endOfMonth, format, parseISO, isValid, subMonths, startOfYear, endOfYear } from 'date-fns';
+import { startOfMonth, endOfMonth, format, parseISO, isValid } from 'date-fns';
 
 // Helper function to check DB connection state
 const isConnected = () => mongoose.connection.readyState === 1;
 
 // Define the structure for the API response
-interface MonthlyIncome {
+interface MonthlyData {
   month: string; // Format: YYYY-MM
   year: number;
   monthIndex: number; // 0-11 for sorting
-  totalIncome: number;
+  totalInvoiced: number; // Total amount of all invoices created in the month
+  totalPaid: number;     // Total amount paid across all invoices created in the month
+  totalDue: number;      // Total amount due across all invoices created in the month
 }
 
 interface IncomeReportResponse {
-  monthlyData: MonthlyIncome[];
-  totalIncomeInRange: number;
+  monthlyData: MonthlyData[];
+  totalInvoicedInRange: number;
+  totalPaidInRange: number;
+  totalDueInRange: number;
   startDate: string; // ISO string
   endDate: string; // ISO string
 }
 
-// GET handler to retrieve income report data
+// GET handler to retrieve financial report data
 export async function GET(request: NextRequest) {
   try {
     // Connect to the database
@@ -63,34 +67,44 @@ export async function GET(request: NextRequest) {
 
     // Define the aggregation pipeline
     const pipeline = [
-      // Stage 1: Filter invoices by status 'Completed' and within the date range
-      // We filter by invoiceDate for simplicity, assuming payment correlates closely.
-      // A more accurate report might use a dedicated 'paymentDate' field if available.
+      // Stage 1: Filter invoices by invoiceDate within the date range
+      // No longer filtering by status
       {
         $match: {
-          status: 'Completed', // Only count income from completed invoices
           invoiceDate: {
             $gte: startDate,
             $lte: endDate,
           },
         },
       },
-      // Stage 2: Group by year and month of the invoiceDate
+      // Stage 2: Calculate totalAmount for each invoice (as it's not stored directly)
+      {
+        $addFields: {
+          calculatedTotalAmount: {
+            $reduce: {
+              input: '$items',
+              initialValue: 0,
+              in: { $add: ['$$value', { $multiply: ['$$this.quantity', '$$this.price'] }] }
+            }
+          }
+        }
+      },
+      // Stage 3: Group by year and month of the invoiceDate
       {
         $group: {
           _id: {
             year: { $year: '$invoiceDate' },
             month: { $month: '$invoiceDate' },
           },
-          // Sum the 'paidAmount' for each month.
-          // If paidAmount isn't always set on completion, sum the items total.
-          // Let's assume paidAmount reflects the income received for completed invoices.
-          monthlyIncome: { $sum: '$paidAmount' }, // Or calculate from items if needed
-          // If using calculated totalAmount:
-          // monthlyIncome: { $sum: { $reduce: { input: "$items", initialValue: 0, in: { $add: ["$$value", { $multiply: ["$$this.quantity", "$$this.price"] }] } } } }
+          // Sum the calculated total amount for each month
+          monthlyInvoiced: { $sum: '$calculatedTotalAmount' },
+          // Sum the paid amount for each month
+          monthlyPaid: { $sum: '$paidAmount' },
+          // Sum the due amount (calculatedTotal - paid) for each month
+          monthlyDue: { $sum: { $subtract: ['$calculatedTotalAmount', '$paidAmount'] } },
         },
       },
-       // Stage 3: Calculate total income for the entire range
+       // Stage 4: Calculate totals for the entire range and format monthly data
       {
           $group: {
               _id: null, // Group all documents together
@@ -102,18 +116,24 @@ export async function GET(request: NextRequest) {
                           // Format month as YYYY-MM string
                           $dateToString: { format: '%Y-%m', date: { $dateFromParts: { 'year': '$_id.year', 'month': '$_id.month', 'day': 1 } } }
                       },
-                      totalIncome: '$monthlyIncome'
+                      totalInvoiced: '$monthlyInvoiced',
+                      totalPaid: '$monthlyPaid',
+                      totalDue: '$monthlyDue',
                   }
               },
-              totalIncomeInRange: { $sum: '$monthlyIncome' } // Sum all monthly incomes
+              totalInvoicedInRange: { $sum: '$monthlyInvoiced' }, // Sum all monthly invoiced amounts
+              totalPaidInRange: { $sum: '$monthlyPaid' },     // Sum all monthly paid amounts
+              totalDueInRange: { $sum: '$monthlyDue' },       // Sum all monthly due amounts
           }
       },
-      // Stage 4: Project the final structure (optional, but good practice)
+      // Stage 5: Project the final structure
       {
            $project: {
                 _id: 0, // Exclude the default _id
                 monthlyData: 1,
-                totalIncomeInRange: 1
+                totalInvoicedInRange: 1,
+                totalPaidInRange: 1,
+                totalDueInRange: 1,
            }
       }
     ];
@@ -122,19 +142,31 @@ export async function GET(request: NextRequest) {
     const results = await Invoice.aggregate(pipeline);
 
     // Aggregation returns an array, usually with one element if grouping by null
-    const reportData = results[0] || { monthlyData: [], totalIncomeInRange: 0 };
+    const reportData = results[0] || { monthlyData: [], totalInvoicedInRange: 0, totalPaidInRange: 0, totalDueInRange: 0 };
 
      // Sort monthly data chronologically
-     reportData.monthlyData.sort((a: MonthlyIncome, b: MonthlyIncome) => {
+     reportData.monthlyData.sort((a: MonthlyData, b: MonthlyData) => {
          if (a.year !== b.year) {
              return a.year - b.year;
          }
          return a.monthIndex - b.monthIndex;
      });
 
+    // Ensure monthly data has all required fields, defaulting to 0 if somehow missing
+    const formattedMonthlyData = reportData.monthlyData.map((m: any) => ({
+        month: m.month,
+        year: m.year,
+        monthIndex: m.monthIndex,
+        totalInvoiced: m.totalInvoiced ?? 0,
+        totalPaid: m.totalPaid ?? 0,
+        totalDue: m.totalDue ?? 0,
+    }));
+
     const responsePayload: IncomeReportResponse = {
-       monthlyData: reportData.monthlyData,
-       totalIncomeInRange: reportData.totalIncomeInRange,
+       monthlyData: formattedMonthlyData,
+       totalInvoicedInRange: reportData.totalInvoicedInRange,
+       totalPaidInRange: reportData.totalPaidInRange,
+       totalDueInRange: reportData.totalDueInRange,
        startDate: startDate.toISOString(),
        endDate: endDate.toISOString(),
     };
@@ -142,12 +174,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(responsePayload, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error fetching income report:', error);
+    console.error('Error fetching financial report:', error);
     const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
      if (errorMessage.toLowerCase().includes('database connection error')) {
        return NextResponse.json({ message: 'Database connection issue while fetching report.', error: error.name || 'DB Connection Error' }, { status: 503 });
      }
-    return NextResponse.json({ message: 'Failed to fetch income report', error: errorMessage }, { status: 500 });
+    return NextResponse.json({ message: 'Failed to fetch financial report', error: errorMessage }, { status: 500 });
   }
 }
       
