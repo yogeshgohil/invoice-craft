@@ -13,13 +13,13 @@ import { fetchInvoices } from '@/lib/fetch-invoices'; // Import fetch function
 import { Loader2 } from 'lucide-react'; // Import Loader2 for infinite scroll loading
 
 // Define the structure of the invoice object expected from the API
-// Keep this export if other components rely on it
+// Update this interface to include optional totalAmount and totalDue
 export interface Invoice extends InvoiceFormData {
   _id: string;
   createdAt?: string;
   updatedAt?: string;
-  totalAmount?: number;
-  totalDue?: number;
+  totalAmount?: number; // Add optional totalAmount
+  totalDue?: number;    // Add optional totalDue
 }
 
 // Define the structure for filter parameters

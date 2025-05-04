@@ -154,9 +154,9 @@ export default function ViewInvoicePage(props: ViewInvoicePageProps) {
               // Ensure dates are passed as strings if they are Dates
               invoiceDate: typeof invoice.invoiceDate === 'string' ? invoice.invoiceDate.substring(0, 10) : invoice.invoiceDate.toISOString().substring(0, 10),
               dueDate: typeof invoice.dueDate === 'string' ? invoice.dueDate.substring(0, 10) : invoice.dueDate.toISOString().substring(0, 10),
-              // Provide fallbacks for totals if needed
-              totalAmount: invoice.totalAmount ?? invoice.items.reduce((sum, item) => sum + (item.quantity || 0) * (item.price || 0), 0),
-              totalDue: invoice.totalDue ?? invoice.items.reduce((sum, item) => sum + (item.quantity || 0) * (item.price || 0), 0) - (invoice.paidAmount || 0)
+              // Calculate and pass totalAmount and totalDue
+              totalAmount: invoice.items.reduce((sum, item) => sum + (item.quantity || 0) * (item.price || 0), 0),
+              totalDue: invoice.items.reduce((sum, item) => sum + (item.quantity || 0) * (item.price || 0), 0) - (invoice.paidAmount || 0)
             }} />
           ) : (
              // This case should ideally not be reached

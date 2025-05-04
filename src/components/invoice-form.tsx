@@ -201,7 +201,12 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
          return;
      }
     const data = form.getValues();
-    setInvoiceData(data); // Set data to trigger preview rendering inside the dialog
+    setInvoiceData({
+        ...data,
+        // Explicitly add calculated fields for preview if they are not part of the form schema
+        totalAmount: totalAmount,
+        totalDue: totalDue,
+    }); // Set data to trigger preview rendering inside the dialog
     // Toast notification might be excessive here, dialog opening is enough feedback
     // toast({ title: "Preview Ready", description: "Invoice preview updated." });
   };
@@ -245,22 +250,22 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
 
                  if (errorData.errors) {
                      errorMessage = 'Validation failed on the server. Please check your inputs.';
-                 } else if (response.status === 503) { // Check for 503 first
-                    if (serverMessage.toLowerCase().includes('database connection error')) {
-                        console.error("Database connection error reported by API.");
-                        errorMessage = 'Database connection error. Please check the server logs and database configuration.';
-                    } else {
-                        errorMessage = `Service unavailable (503). ${serverMessage || response.statusText}`;
-                    }
+                 } else if (response.status === 503 && serverMessage.toLowerCase().includes('database connection error')) {
+                    // Specific handling for DB connection error
+                    console.error("Database connection error reported by API.");
+                    errorMessage = 'Database connection error. Please check the server logs and database configuration.';
                  } else if (response.status === 409) { // Conflict (duplicate invoice number)
                      errorMessage = serverMessage || 'Invoice conflict (e.g., duplicate number).';
                  } else if (response.status === 404) { // Not Found (for updates)
                      errorMessage = serverMessage || 'Invoice not found for update.';
                  }
             } catch (jsonError) {
-                errorMessage = response.statusText || `HTTP error! Status: ${response.status}`;
+                // If parsing JSON fails, use the status text or a generic message
+                 errorMessage = response.statusText || `HTTP error! Status: ${response.status}`;
                  if (response.status === 503) {
                      errorMessage = 'Service unavailable (503). Server/DB issue.';
+                 } else if (response.status === 500 && !serverMessage) {
+                     errorMessage = 'Internal Server Error. Please check server logs.';
                  }
             }
             // Set the specific error message for the toast
@@ -276,13 +281,17 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
         });
 
         // Update preview data state after successful save/update
-        setInvoiceData(data);
+        setInvoiceData({
+            ...data,
+            totalAmount: totalAmount,
+            totalDue: totalDue,
+        });
 
         // Redirect to the invoices list page after saving/updating
         router.push('/invoices');
 
     } catch (error: any) {
-        const finalErrorDescription = errorToastDescription.startsWith(`Could not ${isEditMode ? 'update' : 'save'} invoice:`)
+         const finalErrorDescription = errorToastDescription.startsWith(`Could not ${isEditMode ? 'update' : 'save'} invoice:`)
             ? errorToastDescription
             : error.message || 'An unknown error occurred.';
 
@@ -304,14 +313,18 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
         return;
      }
     const currentData = form.getValues();
-    // Ensure preview data is set for PDF generation
-    setInvoiceData(currentData);
+    // Ensure preview data is set for PDF generation, including calculated fields
+    setInvoiceData({
+        ...currentData,
+        totalAmount: totalAmount,
+        totalDue: totalDue,
+    });
 
     // Wait for state update and potential re-render of the hidden preview
     await new Promise(resolve => setTimeout(resolve, 150));
 
 
-    if (!invoicePreviewRef.current || !currentData) {
+    if (!invoicePreviewRef.current || !invoiceData) { // Check invoiceData state here
       toast({ title: "Error", description: "Could not generate PDF. Preview data missing.", variant: "destructive"});
       return;
     }
@@ -365,7 +378,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
         const imgY = 0.1; // Example small top margin in inches
 
         pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-        pdf.save(`invoice-${currentData?.invoiceNumber || 'preview'}.pdf`);
+        pdf.save(`invoice-${invoiceData?.invoiceNumber || 'preview'}.pdf`); // Use invoiceData state
         toast({ title: "Download Started", description: "Your invoice PDF is being downloaded."});
 
     } catch (error) {
@@ -386,13 +399,13 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
   // Render skeleton or minimal UI if not client-side yet (important for date fields)
    if (!isClient) {
        return (
-           <div className="space-y-4 sm:space-y-6 p-4"> {/* Use smaller padding on mobile */}
+           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6"> {/* Use smaller padding on mobile */}
                {/* Placeholder cards */}
-               <Card className="bg-card animate-pulse"><CardHeader className="p-4"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 pt-0 space-y-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-20 bg-muted rounded" /></CardContent></Card>
-               <Card className="bg-card animate-pulse"><CardHeader className="p-4"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 pt-0 grid grid-cols-2 gap-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded col-span-2" /><Skeleton className="h-10 bg-muted rounded col-span-2" /></CardContent></Card>
-               <Card className="bg-card animate-pulse"><CardHeader className="p-4"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 pt-0 space-y-4"><Skeleton className="h-20 bg-muted rounded" /><Skeleton className="h-10 w-32 bg-muted rounded" /></CardContent></Card>
+               <Card className="bg-card animate-pulse"><CardHeader className="p-4 sm:p-6"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 sm:p-6 pt-0 space-y-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-20 bg-muted rounded" /></CardContent></Card>
+               <Card className="bg-card animate-pulse"><CardHeader className="p-4 sm:p-6"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 sm:p-6 pt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /><Skeleton className="h-10 bg-muted rounded" /></CardContent></Card>
+               <Card className="bg-card animate-pulse"><CardHeader className="p-4 sm:p-6"><Skeleton className="h-6 w-1/2 bg-muted rounded" /></CardHeader><CardContent className="p-4 sm:p-6 pt-0 space-y-4"><Skeleton className="h-20 bg-muted rounded" /><Skeleton className="h-10 w-32 bg-muted rounded" /></CardContent></Card>
                {/* Add more placeholders as needed */}
-               <CardFooter className="flex flex-col gap-2 pt-6 px-4"> {/* Stack buttons vertically */}
+                <CardFooter className="flex flex-col gap-2 pt-6 px-4 sm:px-6"> {/* Stack buttons vertically */}
                     <Skeleton className="h-9 w-full bg-muted rounded-md" />
                     <Skeleton className="h-9 w-full bg-muted rounded-md" />
                     <Skeleton className="h-9 w-full bg-muted rounded-md" />
@@ -612,7 +625,15 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
                                  </DialogHeader>
                                  <div className="flex-grow overflow-auto p-4 bg-muted/20">
                                      {invoiceData ? (
-                                         <InvoicePreview data={invoiceData} />
+                                         <InvoicePreview data={{
+                                            ...invoiceData,
+                                            // Pass calculated values explicitly to preview
+                                            totalAmount: totalAmount,
+                                            totalDue: totalDue,
+                                            // Ensure dates are in string format if needed by preview
+                                            invoiceDate: typeof invoiceData.invoiceDate === 'string' ? invoiceData.invoiceDate : format(invoiceData.invoiceDate, 'yyyy-MM-dd'),
+                                            dueDate: typeof invoiceData.dueDate === 'string' ? invoiceData.dueDate : format(invoiceData.dueDate, 'yyyy-MM-dd')
+                                        }} />
                                      ) : (
                                          <div className="flex items-center justify-center h-full text-muted-foreground">
                                              Update form to see preview.
@@ -649,11 +670,17 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
              aria-hidden="true"
          >
              {/* Render preview only when data is available */}
-             {invoiceData && <InvoicePreview data={invoiceData} />}
+             {invoiceData && <InvoicePreview data={{
+                 ...invoiceData,
+                 // Pass calculated fields to the hidden preview as well
+                 totalAmount: totalAmount,
+                 totalDue: totalDue,
+                 // Dates should ideally be strings here if InvoicePreview expects them
+                 invoiceDate: typeof invoiceData.invoiceDate === 'string' ? invoiceData.invoiceDate : format(invoiceData.invoiceDate, 'yyyy-MM-dd'),
+                 dueDate: typeof invoiceData.dueDate === 'string' ? invoiceData.dueDate : format(invoiceData.dueDate, 'yyyy-MM-dd')
+            }} />}
         </div>
         </form>
     </Form>
   );
 }
-
-

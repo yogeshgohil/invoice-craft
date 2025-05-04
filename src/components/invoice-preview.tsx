@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import type { InvoiceFormData } from './invoice-form'; // Ensure this path is correct
@@ -10,18 +9,16 @@ import { formatCurrency } from '@/lib/utils'; // Import utility
 import { Badge } from '@/components/ui/badge'; // Import Badge
 import { format, parseISO } from 'date-fns'; // Import date-fns
 
+// Update interface to include optional calculated fields
 interface InvoicePreviewProps {
-  data: InvoiceFormData;
+  data: InvoiceFormData & { totalAmount?: number, totalDue?: number };
 }
 
 export function InvoicePreview({ data }: InvoicePreviewProps) {
-  const calculateTotal = () => {
-    return data.items.reduce((sum, item) => sum + (item.quantity || 0) * (item.price || 0), 0);
-  };
-
-  const totalAmount = calculateTotal();
+  // Use passed-in values if available, otherwise calculate
+  const totalAmount = data.totalAmount ?? data.items.reduce((sum, item) => sum + (item.quantity || 0) * (item.price || 0), 0);
   const paidAmount = data.paidAmount || 0; // Use default 0 if undefined
-  const totalDue = totalAmount - paidAmount;
+  const totalDue = data.totalDue ?? (totalAmount - paidAmount);
 
 
    // Helper function to format date (handles potential timezone issues and invalid dates)
@@ -212,6 +209,4 @@ if (typeof window !== 'undefined') {
     document.head.appendChild(styleSheet);
   }
 }
-
-
 
