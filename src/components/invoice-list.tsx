@@ -18,7 +18,7 @@ import type { Invoice } from '@/app/invoices/page'; // Import the Invoice type f
 import { format, parseISO, isValid } from 'date-fns'; // Use date-fns for reliable formatting
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Edit, Eye, Trash2, Loader2 } from 'lucide-react'; // Import Eye, Trash2, Loader2 icons
+import { Edit, Eye, Trash2, Loader2, CheckCircle } from 'lucide-react'; // Import Eye, Trash2, Loader2, CheckCircle icons
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,6 +36,7 @@ import { useState } from 'react'; // Keep useState for isDeleting
 interface InvoiceListProps {
   invoices: Invoice[];
   onInvoiceDeleted?: (invoiceId: string) => void; // Add callback prop
+  onInvoiceUpdated?: (updatedInvoice: Invoice) => void; // Add callback for updates
 }
 
 // Helper function to format date (handles potential timezone issues and invalid dates)
@@ -77,8 +78,9 @@ const formatDate = (dateString: string | undefined | Date): string => {
  };
 
 
-export function InvoiceList({ invoices, onInvoiceDeleted }: InvoiceListProps) {
+export function InvoiceList({ invoices, onInvoiceDeleted, onInvoiceUpdated }: InvoiceListProps) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null); // Track deleting state for specific invoice
+  const [isMarkingPaid, setIsMarkingPaid] = useState<string | null>(null); // Track marking paid state
   const { toast } = useToast();
 
    const handleDeleteInvoice = async (invoiceId: string, invoiceNumber: string) => {
@@ -121,6 +123,58 @@ export function InvoiceList({ invoices, onInvoiceDeleted }: InvoiceListProps) {
       } finally {
           setIsDeleting(null); // Stop loading state
       }
+   };
+
+   const handleMarkAsPaid = async (invoice: Invoice) => {
+       setIsMarkingPaid(invoice._id);
+       const totalAmount = invoice.totalAmount ?? calculateTotalAmount(invoice.items);
+
+       try {
+           const response = await fetch(`/api/invoices/${invoice._id}`, {
+               method: 'PATCH', // Use PATCH to update status and potentially paidAmount
+               headers: {
+                   'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({
+                   status: 'Completed',
+                   paidAmount: totalAmount, // Set paid amount to the total amount
+               }),
+           });
+
+           if (!response.ok) {
+               let errorMsg = `Failed to mark invoice #${invoice.invoiceNumber} as paid.`;
+               try {
+                   const errorData = await response.json();
+                   errorMsg = errorData.message || `HTTP error! Status: ${response.status}`;
+               } catch (e) {
+                    errorMsg = `HTTP error marking invoice ${invoice._id} as paid! Status: ${response.status} ${response.statusText || ''}`.trim();
+               }
+               throw new Error(errorMsg);
+           }
+
+            const updatedInvoiceData = await response.json();
+
+           toast({
+               title: "Invoice Paid",
+               description: `Invoice #${invoice.invoiceNumber} marked as paid.`,
+               duration: 3000,
+           });
+
+           // Call the callback to update the parent state
+            if (onInvoiceUpdated && updatedInvoiceData.data) {
+                onInvoiceUpdated(updatedInvoiceData.data);
+            }
+
+       } catch (error: any) {
+           console.error("Error marking invoice as paid:", error);
+           toast({
+               title: "Update Failed",
+               description: error.message || `Could not mark invoice #${invoice.invoiceNumber} as paid.`,
+               variant: "destructive",
+           });
+       } finally {
+           setIsMarkingPaid(null);
+       }
    };
 
 
@@ -171,6 +225,23 @@ export function InvoiceList({ invoices, onInvoiceDeleted }: InvoiceListProps) {
                   {formatCurrency(totalDue)}
                 </TableCell>
                  <TableCell className="text-center p-1 sm:p-2 space-x-0.5 sm:space-x-1"> {/* Reduced padding and spacing */}
+                      {/* Mark as Paid Button - Show only if not already Completed */}
+                       {invoice.status !== 'Completed' && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label="Mark as paid"
+                                className="h-6 w-6 sm:h-7 sm:w-7 text-muted-foreground hover:text-green-600"
+                                onClick={() => handleMarkAsPaid(invoice)}
+                                disabled={isMarkingPaid === invoice._id}
+                            >
+                               {isMarkingPaid === invoice._id ? (
+                                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                               ) : (
+                                   <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                               )}
+                            </Button>
+                       )}
                      {/* View Button - Smaller size */}
                       <Link href={`/invoices/${invoice._id}/view`} passHref legacyBehavior>
                          <Button variant="ghost" size="icon" aria-label="View invoice" className="h-6 w-6 sm:h-7 sm:w-7 text-muted-foreground hover:text-foreground"> {/* Smaller button */}
@@ -229,3 +300,6 @@ export function InvoiceList({ invoices, onInvoiceDeleted }: InvoiceListProps) {
     </div>
   );
 }
+
+
+    

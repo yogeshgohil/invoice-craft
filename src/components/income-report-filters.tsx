@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -102,13 +103,14 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
    // Prevent rendering date-dependent UI on server
    if (!isClient) {
       return (
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 mb-4">
-              <div className="grid gap-2 w-full sm:w-auto">
-                 <Skeleton className="h-4 w-24" />
-                 <Skeleton className="h-9 w-full sm:w-64" />
+          // Adjusted skeleton layout for mobile friendliness
+          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div className="grid gap-1.5 w-full sm:w-auto"> {/* Adjusted gap */}
+                 <Skeleton className="h-3.5 w-20" /> {/* Adjusted size */}
+                 <Skeleton className="h-8 w-full sm:w-56" /> {/* Adjusted size */}
               </div>
-              <Skeleton className="h-9 w-24" />
-              <Skeleton className="h-9 w-24" />
+              <Skeleton className="h-8 w-full sm:w-20" /> {/* Adjusted size */}
+              <Skeleton className="h-8 w-full sm:w-20" /> {/* Adjusted size */}
           </div>
       );
    }
@@ -117,20 +119,21 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
    const displayTo = dateRange?.to && isValid(dateRange.to) ? format(dateRange.to, "LLL dd, y") : '';
 
   return (
-     <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 mb-4">
-       <div className="grid gap-2 w-full sm:w-auto">
-        <Label htmlFor="date-range-picker" className="text-sm">Select Date Range</Label>
+     // Adjusted layout for mobile friendliness
+     <div className="flex flex-col sm:flex-row items-start sm:items-end gap-2 sm:gap-3 mb-3 sm:mb-4">
+       <div className="grid gap-1.5 w-full sm:w-auto"> {/* Adjusted gap */}
+        <Label htmlFor="date-range-picker" className="text-xs sm:text-sm">Select Date Range</Label> {/* Adjusted size */}
          <Popover>
            <PopoverTrigger asChild>
              <Button
                id="date-range-picker"
                variant={"outline"}
                className={cn(
-                 "w-full sm:w-[300px] justify-start text-left font-normal",
+                 "w-full sm:w-[240px] md:w-[300px] justify-start text-left font-normal h-8 text-xs sm:text-sm", // Adjusted size and width
                  !dateRange?.from && "text-muted-foreground"
                )}
              >
-               <CalendarIcon className="mr-2 h-4 w-4" />
+               <CalendarIcon className="mr-1.5 h-3.5 w-3.5" /> {/* Adjusted size */}
                {displayFrom ? (
                  displayTo ? (
                    <>
@@ -144,7 +147,7 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
                )}
              </Button>
            </PopoverTrigger>
-           <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0" align="start">
              <Calendar
                initialFocus
                mode="range"
@@ -152,27 +155,38 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
                defaultMonth={dateRange?.from && isValid(dateRange.from) ? dateRange.from : defaultStart}
                selected={dateRange?.from && isValid(dateRange.from) ? dateRange : { from: defaultStart, to: defaultEnd }}
                onSelect={handleDateChange} // Update state on select
-               numberOfMonths={2}
+               numberOfMonths={1} // Show only 1 month on mobile
+               className="sm:hidden" // Hide single month view on larger screens
+             />
+             <Calendar
+               initialFocus
+               mode="range"
+               // Use valid dates for defaultMonth, selected
+               defaultMonth={dateRange?.from && isValid(dateRange.from) ? dateRange.from : defaultStart}
+               selected={dateRange?.from && isValid(dateRange.from) ? dateRange : { from: defaultStart, to: defaultEnd }}
+               onSelect={handleDateChange} // Update state on select
+               numberOfMonths={2} // Show two months on larger screens
+               className="hidden sm:block" // Hide two month view on small screens
              />
            </PopoverContent>
          </Popover>
        </div>
-        {/* Apply Filter Button */}
+        {/* Apply Filter Button - Adjusted size */}
         <Button
            onClick={handleFilterApply}
            size="sm"
-           className="w-full sm:w-auto" // Full width on mobile
+           className="w-full sm:w-auto h-8 text-xs sm:text-sm" // Adjusted size
            // Disable if 'from' date is missing or invalid
            disabled={!dateRange?.from || !isValid(dateRange.from)}
         >
-            <Filter className="mr-2 h-4 w-4" /> Apply Filter
+            <Filter className="mr-1.5 h-3.5 w-3.5" /> Apply {/* Adjusted size */}
         </Button>
-        {/* Clear Filter Button */}
+        {/* Clear Filter Button - Adjusted size */}
         <Button
             variant="outline"
             size="sm"
             onClick={clearFilters}
-            className="w-full sm:w-auto" // Full width on mobile
+            className="w-full sm:w-auto h-8 text-xs sm:text-sm" // Adjusted size
             // Disable if state reflects default AND no params in URL
             disabled={
                 dateRange?.from?.getTime() === defaultStart.getTime() &&
@@ -180,8 +194,11 @@ export function IncomeReportFilters({ initialStartDate, initialEndDate }: Income
                 !searchParams.get('startDate') && !searchParams.get('endDate')
             }
         >
-            <FilterX className="mr-2 h-4 w-4" /> Clear Range
+            <FilterX className="mr-1.5 h-3.5 w-3.5" /> Clear {/* Adjusted size */}
         </Button>
      </div>
   );
 }
+
+
+    

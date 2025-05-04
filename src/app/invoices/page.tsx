@@ -98,7 +98,8 @@ export default function InvoicesPage() {
         setPagination(null);
         // Load the first page with current filters
         loadInvoices(1, filters);
-    }, [searchParams, loadInvoices]); // Re-run when searchParams (filters) change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams]); // Re-run when searchParams (filters) change
 
 
     // Effect for setting up Intersection Observer
@@ -142,6 +143,16 @@ export default function InvoicesPage() {
          // Optionally adjust pagination totals if needed, though a refresh might be simpler
           setPagination(prevPagination => prevPagination ? { ...prevPagination, totalInvoices: prevPagination.totalInvoices - 1 } : null);
      };
+
+      // Handler to update an invoice in the list (e.g., after marking as paid)
+      const handleInvoiceUpdated = (updatedInvoice: Invoice) => {
+          setInvoices(prevInvoices =>
+              prevInvoices.map(invoice =>
+                  invoice._id === updatedInvoice._id ? updatedInvoice : invoice
+              )
+          );
+          // Optionally, update groupedInvoices if using grid view directly here
+      };
 
   return (
      // Reduced padding for mobile view
@@ -191,6 +202,7 @@ export default function InvoicesPage() {
                    invoices={invoices}
                    fetchError={fetchError}
                    onInvoiceDeleted={handleInvoiceDeleted} // Pass the delete handler
+                   onInvoiceUpdated={handleInvoiceUpdated} // Pass the update handler
                  />
                   {/* Load More Indicator */}
                   <div ref={loadMoreRef} className="flex justify-center py-4">
@@ -207,3 +219,6 @@ export default function InvoicesPage() {
     </main>
   );
 }
+
+
+    

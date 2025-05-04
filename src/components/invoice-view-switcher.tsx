@@ -13,29 +13,19 @@ interface InvoiceViewSwitcherProps {
   invoices: Invoice[];
   fetchError: string | null;
   onInvoiceDeleted?: (invoiceId: string) => void; // Accept callback prop
+  onInvoiceUpdated?: (updatedInvoice: Invoice) => void; // Accept update callback prop
 }
 
-export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted }: InvoiceViewSwitcherProps) {
+export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted, onInvoiceUpdated }: InvoiceViewSwitcherProps) {
   const [view, setView] = useState<'list' | 'grid'>('list'); // Default to list view
 
   return (
     <div>
        {/* Use flex-col on small screens, adjust spacing */}
        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2"> {/* Adjusted layout, reduced margin */}
-          {/* Create Button and View Toggle Group */}
-           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch"> {/* Group buttons */}
-              {/* Create New Bill Button */}
-              <Link href="/invoices/new" passHref legacyBehavior>
-                  <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                      <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create New Bill {/* Adjusted icon margin/size */}
-                  </Button>
-              </Link>
-              {/* REMOVED Income Report Button */}
-          </div>
-
 
          {/* View Toggle Buttons - Align end */}
-         <div className="flex items-center justify-end sm:justify-end"> {/* Align end */}
+         <div className="flex items-center justify-start sm:justify-start order-2 sm:order-1"> {/* Align start */}
              <Button
                variant={view === 'list' ? 'default' : 'outline'}
                size="icon" // Use icon size for compact buttons
@@ -55,6 +45,17 @@ export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted }: 
                <LayoutGrid className="h-4 w-4" /> {/* Keep icon size */}
              </Button>
          </div>
+
+         {/* Create Button and View Toggle Group */}
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2"> {/* Group buttons */}
+              {/* Create New Bill Button */}
+              <Link href="/invoices/new" passHref legacyBehavior>
+                  <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                      <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Create New Bill {/* Adjusted icon margin/size */}
+                  </Button>
+              </Link>
+              {/* REMOVED Income Report Button */}
+          </div>
       </div>
 
       {/* Conditional rendering based on fetchError */}
@@ -81,7 +82,11 @@ export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted }: 
         ) : (
         // Render list or grid view
         view === 'list' ? (
-          <InvoiceList invoices={invoices} onInvoiceDeleted={onInvoiceDeleted} /> // Pass delete handler
+          <InvoiceList
+             invoices={invoices}
+             onInvoiceDeleted={onInvoiceDeleted} // Pass delete handler
+             onInvoiceUpdated={onInvoiceUpdated} // Pass update handler
+           />
         ) : (
           // Pass invoices as initialInvoices to the grid component
           <InvoiceGrid initialInvoices={invoices} />
@@ -90,3 +95,6 @@ export function InvoiceViewSwitcher({ invoices, fetchError, onInvoiceDeleted }: 
     </div>
   );
 }
+
+
+    
