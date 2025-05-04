@@ -76,9 +76,9 @@ export function InvoicePreview({ data }: InvoicePreviewProps) {
         <div className="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
            {/* Your Company Details */}
            <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-700">Mahakali Ariwork</h2> {/* Smaller text */}
-           <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500">123 Your Street, Your City, Your State 12345</p> {/* Smaller text */}
+           <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500">41, Panchavati Society, Bapasitaram Chowk,Kataragam, Surat.</p> {/* Smaller text */}
            <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500">your.email@example.com</p> {/* Smaller text */}
-           <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500">(123) 456-7890</p> {/* Smaller text */}
+           <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500">8141437848</p> {/* Smaller text */}
         </div>
       </div>
 
@@ -211,4 +211,5 @@ if (typeof window !== 'undefined') {
     document.head.appendChild(styleSheet);
   }
 }
+
 
