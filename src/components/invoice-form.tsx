@@ -51,6 +51,7 @@ const invoiceItemSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   quantity: z.coerce.number().min(1, 'Quantity must be at least 1'),
   price: z.coerce.number().min(0.01, 'Price must be positive'),
+  color: z.string().optional().default('#000000'), // Added optional color field
 });
 
 // Define allowed status values
@@ -127,6 +128,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
     if (isEditMode && initialData) {
         setInvoiceData({
             ...initialData,
+            items: initialData.items.map(item => ({ ...item, color: item.color || '#000000' })), // Ensure color exists
             invoiceDate: formatDateForInput(initialData.invoiceDate),
             dueDate: formatDateForInput(initialData.dueDate),
             paidAmount: initialData.paidAmount ?? 0,
@@ -140,6 +142,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
     resolver: zodResolver(invoiceSchema),
     defaultValues: initialData ? {
         ...initialData,
+        items: initialData.items.map(item => ({ ...item, color: item.color || '#000000' })), // Ensure color exists
         // Ensure dates are formatted correctly for the input type="date"
         invoiceDate: formatDateForInput(initialData.invoiceDate),
         dueDate: formatDateForInput(initialData.dueDate),
@@ -152,7 +155,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
       invoiceNumber: '', // Will be set by useEffect for new invoices
       invoiceDate: formatDateForInput(new Date()), // Default to today
       dueDate: formatDateForInput(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)), // Default 30 days from now
-      items: [{ description: '', quantity: 1, price: 0 }],
+      items: [{ description: '', quantity: 1, price: 0, color: '#000000' }], // Add default color
       notes: '',
       paidAmount: 0,
       status: "Pending",
@@ -242,20 +245,18 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
 
                  if (errorData.errors) {
                      errorMessage = 'Validation failed on the server. Please check your inputs.';
-                 } else if (response.status === 503 && serverMessage.toLowerCase().includes('database connection error')) {
+                 } else if (response.status === 503 && serverMessage.toLowerCase().includes('database connection')) {
                     // Specific handling for DB connection error
                     errorMessage = 'Database connection error. Please check the server logs and database configuration.';
                  } else if (response.status === 409) { // Conflict (duplicate invoice number)
                      errorMessage = serverMessage || 'Invoice conflict (e.g., duplicate number).';
                  } else if (response.status === 404) { // Not Found (for updates)
                      errorMessage = serverMessage || 'Invoice not found for update.';
-                 } else {
                  }
             } catch (jsonError) {
                 errorMessage = response.statusText || `HTTP error! Status: ${response.status}`;
                  if (response.status === 503) {
                      errorMessage = 'Service unavailable (503). Server/DB issue.';
-                 } else {
                  }
             }
             // Set the specific error message for the toast
@@ -414,7 +415,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
                         <FormField control={form.control} name="customerName" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Customer Name</FormLabel>
-                                <FormControl><Input placeholder="John Doe" {...field} /></FormControl>
+                                <FormControl><Input placeholder="Ravina" {...field} /></FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
@@ -465,6 +466,20 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
                                         <FormMessage />
                                     </FormItem>
                                 )} />
+                                 {/* Color Picker */}
+                                <FormField control={form.control} name={`items.${index}.color`} render={({ field }) => (
+                                    <FormItem className="w-full md:w-16 flex flex-col items-start pt-1.5">
+                                        <FormLabel className="text-xs sr-only">Color</FormLabel>
+                                         <FormControl>
+                                             <Input
+                                                 type="color"
+                                                 className="h-8 w-10 sm:w-12 p-1 border rounded cursor-pointer" // Basic styling for color input
+                                                 {...field}
+                                             />
+                                         </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
                                 <div className="flex items-center self-center md:self-start mt-2 md:mt-0 md:pt-[1.7rem]"> {/* Align button */}
                                     <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove item" disabled={fields.length <= 1} className="w-8 h-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
                                         <Trash2 className="h-4 w-4" />
@@ -476,7 +491,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
                         {form.formState.errors.items?.root && (<p className="text-sm text-destructive">{form.formState.errors.items.root.message}</p>)}
                         {form.formState.errors.items && !form.formState.errors.items.root && typeof form.formState.errors.items === 'object' && 'message' in form.formState.errors.items && (<p className="text-sm text-destructive">{form.formState.errors.items.message}</p>)}
 
-                        <Button type="button" variant="outline" size="sm" onClick={() => append({ description: '', quantity: 1, price: 0 })} className="w-full sm:w-auto border-dashed"> {/* Dashed border */}
+                        <Button type="button" variant="outline" size="sm" onClick={() => append({ description: '', quantity: 1, price: 0, color: '#000000' })} className="w-full sm:w-auto border-dashed"> {/* Dashed border */}
                             <PlusCircle className="mr-2 h-4 w-4" /> Add Item
                         </Button>
                     </CardContent>
@@ -636,4 +651,3 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
   );
 }
 
-    
