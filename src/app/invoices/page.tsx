@@ -1,6 +1,7 @@
+
 'use client'; // Convert to Client Component
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import type { InvoiceFormData } from '@/components/invoice-form';
 import { InvoiceFilters } from '@/components/invoice-filters';
@@ -39,7 +40,8 @@ interface PaginationInfo {
 
 const ITEMS_PER_PAGE = 10; // Number of items to load per page/batch
 
-export default function InvoicesPage() {
+// Separate component to use useSearchParams
+function InvoicesContent() {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true); // Loading state for initial load
@@ -155,7 +157,8 @@ export default function InvoicesPage() {
 
   return (
      // Reduced padding for mobile view
-    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background">
+     // Removed justify-start to allow center alignment by default?
+    <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
       <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-1 sm:space-y-0 sm:space-x-4 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
             <CardTitle className="text-base sm:text-lg font-semibold text-foreground">Invoice</CardTitle> {/* Adjusted font size */}
@@ -218,4 +221,59 @@ export default function InvoicesPage() {
       </Card>
     </main>
   );
+}
+
+
+export default function InvoicesPage() {
+   // Wrap content in Suspense to handle client-side data fetching states
+    return (
+        <Suspense fallback={<LoadingSkeleton />}>
+            <InvoicesContent />
+        </Suspense>
+    );
+}
+
+// Skeleton component for Suspense fallback
+function LoadingSkeleton() {
+    return (
+        <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
+            <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden">
+                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-1 sm:space-y-0 sm:space-x-4 pb-3 border-b p-3 sm:p-4 bg-card">
+                    <Skeleton className="h-5 w-24 rounded" />
+                </CardHeader>
+                <CardContent className="p-3 sm:p-4">
+                    {/* Skeleton for Filters */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 items-end mb-4 sm:mb-6 animate-pulse">
+                        <Skeleton className="h-9 rounded-md" />
+                        <Skeleton className="h-9 rounded-md" />
+                        <Skeleton className="h-9 rounded-md" />
+                        <Skeleton className="h-9 rounded-md" />
+                        <Skeleton className="h-9 rounded-md" />
+                    </div>
+                    <Separator className="my-3 sm:my-4" />
+                     {/* Skeleton for View Switcher */}
+                    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2">
+                        <div className="flex items-center justify-end sm:justify-start space-x-1.5 order-2 sm:order-1">
+                             <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
+                             <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
+                        </div>
+                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2">
+                             <Skeleton className="h-8 w-full sm:w-36 rounded-md" />
+                             <Skeleton className="h-8 w-full sm:w-32 rounded-md" />
+                         </div>
+                    </div>
+                    {/* Skeleton for List View */}
+                    <div className="rounded-lg border animate-pulse">
+                        <Skeleton className="h-10 w-full rounded-t-md" />
+                        <div className="divide-y divide-border">
+                            {[...Array(ITEMS_PER_PAGE)].map((_, i) => (
+                                <Skeleton key={i} className="h-12 w-full" />
+                            ))}
+                        </div>
+                        <Skeleton className="h-8 w-full rounded-b-md"/>
+                    </div>
+                </CardContent>
+            </Card>
+        </main>
+    );
 }

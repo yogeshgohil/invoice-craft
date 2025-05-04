@@ -1,3 +1,4 @@
+
 'use client'; // Ensure this is a Client Component
 
 import { useState, useEffect } from 'react';
@@ -57,7 +58,8 @@ export default function EditInvoicePage(props: EditInvoicePageProps) {
   // Render loading state
   if (isLoading) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background"> {/* Reduced padding */}
+       // Reduced padding, removed justify-start
+      <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
          <Card className="w-full max-w-6xl shadow-lg border border-border rounded-xl overflow-hidden">
            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
              <div>
@@ -107,7 +109,8 @@ export default function EditInvoicePage(props: EditInvoicePageProps) {
 
   // Render form if data is loaded successfully
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background"> {/* Reduced padding */}
+    // Reduced padding, removed justify-start
+    <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
       <Card className="w-full max-w-6xl shadow-lg border border-border rounded-xl overflow-hidden">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
             <div>

@@ -16,7 +16,8 @@ function LayoutContent({ children }: { children: ReactNode }) {
     return (
         <>
             {/* Adjust padding as needed since SidebarInset is removed */}
-            <main className="p-2 sm:p-4 md:p-6 min-h-screen"> {/* Add padding directly */}
+            {/* Reduced padding */}
+            <main className="p-2 sm:p-4 min-h-screen"> {/* Add padding directly */}
                 {children}
             </main>
             <Toaster /> {/* Add Toaster here */}
@@ -46,3 +47,4 @@ export default function RootLayout({
     </html>
   );
 }
+

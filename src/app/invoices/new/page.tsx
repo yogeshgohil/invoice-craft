@@ -1,3 +1,4 @@
+
 'use client'; // Add 'use client' because InvoiceForm is a client component
 
 import { InvoiceForm } from '@/components/invoice-form';
@@ -9,7 +10,8 @@ import { ArrowLeft } from 'lucide-react';
 export default function CreateInvoicePage() {
   return (
      // Reduced padding for mobile view
-    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background">
+     // Removed justify-start
+    <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
        <Card className="w-full max-w-6xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Rounded Card */}
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
            <div> {/* Group title and description */}

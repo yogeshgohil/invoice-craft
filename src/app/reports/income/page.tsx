@@ -66,7 +66,9 @@ function IncomeReportContent() {
 
     // Ensure the return statement is correctly wrapped in parentheses
     return (
-        <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background">
+        // Adjusted padding for overall page
+        // Removed justify-start
+        <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
              <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Increased max-width slightly */}
                 {/* Adjusted padding and text sizes in header */}
                  <CardHeader className="border-b pb-3 p-3 sm:p-4 flex flex-row items-center justify-between">
@@ -194,7 +196,8 @@ export default function IncomeReportPage() {
 // Basic Skeleton for Suspense Fallback
 function LoadingSkeleton() {
     return (
-         <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 bg-background">
+        // Removed justify-start
+         <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
              <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Increased max-width */}
                   <CardHeader className="border-b pb-3 p-3 sm:p-4 flex flex-row items-center justify-between">
                       <div>
@@ -233,3 +236,4 @@ function LoadingSkeleton() {
          </main>
     );
 }
+
