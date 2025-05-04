@@ -64,13 +64,14 @@ export default function InvoicesPage() {
     }, [searchParams]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
+     // Reduced padding for mobile view
+    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 md:p-6 bg-background">
       <Card className="w-full max-w-7xl shadow-lg border border-border rounded-xl overflow-hidden">
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-4 border-b p-4 sm:p-6 bg-card">
-            <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Invoice</CardTitle>
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-1 sm:space-y-0 sm:space-x-4 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
+            <CardTitle className="text-base sm:text-lg font-semibold text-foreground">Invoice</CardTitle> {/* Adjusted font size */}
             {/* Create Button is now moved inside InvoiceViewSwitcher */}
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent className="p-3 sm:p-4"> {/* Reduced padding */}
             <InvoiceFilters
                 initialFilters={{
                     customerName: filters.customerName ?? '',
@@ -80,29 +81,29 @@ export default function InvoicesPage() {
                 }}
              />
 
-            <Separator className="my-4 sm:my-6" />
+            <Separator className="my-3 sm:my-4" /> {/* Reduced margin */}
 
             {isLoading ? (
                  // Show a loading indicator (Skeleton) while fetching
-                 <div className="space-y-4">
-                     <div className="flex justify-between items-center mb-4 space-x-2"> {/* Adjusted layout */}
+                 <div className="space-y-3"> {/* Reduced spacing */}
+                     <div className="flex justify-between items-center mb-3 space-x-2"> {/* Adjusted layout, reduced margin */}
                         {/* Skeleton for create button */}
-                        <Skeleton className="h-9 w-32 sm:w-[180px] rounded-md" />
+                        <Skeleton className="h-8 w-28 sm:w-[160px] rounded-md" /> {/* Adjusted size */}
                         {/* Skeletons for view toggle buttons */}
-                         <div className='flex items-center space-x-2'>
-                           <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-md" />
-                           <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-md" />
+                         <div className='flex items-center space-x-1.5'> {/* Reduced spacing */}
+                           <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" /> {/* Adjusted size */}
+                           <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-md" />
                          </div>
                      </div>
                      {/* Skeleton for List View */}
                       <div className="rounded-lg border">
-                          <Skeleton className="h-12 w-full rounded-t-md" /> {/* Header */}
+                          <Skeleton className="h-10 w-full rounded-t-md" /> {/* Adjusted Header size */}
                           <div className="divide-y divide-border">
                               {[...Array(5)].map((_, i) => (
-                                <Skeleton key={i} className="h-14 w-full" />
+                                <Skeleton key={i} className="h-12 w-full" /> /* Adjusted row height */
                               ))}
                           </div>
-                          <Skeleton className="h-10 w-full rounded-b-md"/> {/* Footer/Caption */}
+                          <Skeleton className="h-8 w-full rounded-b-md"/> {/* Adjusted Footer/Caption size */}
                       </div>
                  </div>
              ) : (

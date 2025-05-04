@@ -58,58 +58,58 @@ export default function ViewInvoicePage(props: ViewInvoicePageProps) {
   // Render loading state
   if (isLoading) {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background print:bg-white print:p-0">
+        <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 md:p-6 bg-background print:bg-white print:p-0"> {/* Reduced padding */}
            <Card className="w-full max-w-4xl shadow-lg print:shadow-none print:border-none">
-                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 border-b mb-4 print:hidden">
-                   <Skeleton className="h-7 w-48 rounded" />
-                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                       <Skeleton className="h-9 w-full sm:w-24 rounded-md" />
-                       <Skeleton className="h-9 w-full sm:w-24 rounded-md" />
-                       <Skeleton className="h-9 w-full sm:w-24 rounded-md" />
+                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 border-b mb-3 print:hidden p-3 sm:p-4"> {/* Reduced padding/margin */}
+                   <Skeleton className="h-6 w-40 rounded" /> {/* Adjusted size */}
+                   <div className="flex flex-col sm:flex-row gap-1.5 w-full sm:w-auto"> {/* Reduced gap */}
+                       <Skeleton className="h-7 w-full sm:w-20 rounded-md" /> {/* Adjusted size */}
+                       <Skeleton className="h-7 w-full sm:w-20 rounded-md" />
+                       <Skeleton className="h-7 w-full sm:w-20 rounded-md" />
                    </div>
                 </CardHeader>
-                <CardContent className="p-0 sm:p-6 print:p-0">
+                <CardContent className="p-0 sm:p-4 print:p-0"> {/* Reduced padding */}
                    {/* Skeleton for Invoice Preview */}
-                   <div className="animate-pulse space-y-6 p-4 sm:p-6">
-                       <div className="flex flex-col sm:flex-row justify-between items-start mb-6">
-                         <div className="mb-4 sm:mb-0">
-                           <Skeleton className="h-8 w-32 mb-2" />
-                           <Skeleton className="h-4 w-24 mb-2" />
-                           <Skeleton className="h-6 w-20" />
+                   <div className="animate-pulse space-y-4 p-3 sm:p-4"> {/* Reduced spacing/padding */}
+                       <div className="flex flex-col sm:flex-row justify-between items-start mb-4"> {/* Reduced margin */}
+                         <div className="mb-3 sm:mb-0">
+                           <Skeleton className="h-7 w-28 mb-1.5" />
+                           <Skeleton className="h-3.5 w-20 mb-1.5" />
+                           <Skeleton className="h-5 w-16" />
                          </div>
                          <div className="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
-                           <Skeleton className="h-6 w-40 mb-1" />
-                           <Skeleton className="h-4 w-48 mb-1" />
-                           <Skeleton className="h-4 w-40 mb-1" />
-                           <Skeleton className="h-4 w-32" />
+                           <Skeleton className="h-5 w-36 mb-1" />
+                           <Skeleton className="h-3.5 w-44 mb-1" />
+                           <Skeleton className="h-3.5 w-36 mb-1" />
+                           <Skeleton className="h-3.5 w-28" />
                          </div>
                        </div>
-                       <Skeleton className="h-px w-full my-6" />
+                       <Skeleton className="h-px w-full my-4" /> {/* Reduced margin */}
                         {/* ... add more skeleton parts mirroring InvoicePreview structure ... */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
                            <div>
-                             <Skeleton className="h-5 w-20 mb-2" />
-                             <Skeleton className="h-5 w-36 mb-1" />
-                             <Skeleton className="h-4 w-48 mb-1" />
-                             <Skeleton className="h-4 w-40" />
+                             <Skeleton className="h-4 w-16 mb-1.5" />
+                             <Skeleton className="h-4 w-32 mb-1" />
+                             <Skeleton className="h-3 w-40 mb-1" />
+                             <Skeleton className="h-3 w-36" />
                            </div>
                            <div className="text-left sm:text-right mt-3 sm:mt-0">
-                             <Skeleton className="h-5 w-40 mb-1" />
-                             <Skeleton className="h-5 w-40" />
+                             <Skeleton className="h-4 w-36 mb-1" />
+                             <Skeleton className="h-4 w-36" />
                            </div>
                          </div>
-                         <div className="mb-6">
-                           <Skeleton className="h-10 w-full rounded-t-md" />
-                           <div className="border border-t-0 rounded-b-md p-2 space-y-2">
-                             <Skeleton className="h-8 w-full" />
-                             <Skeleton className="h-8 w-full" />
+                         <div className="mb-4">
+                           <Skeleton className="h-8 w-full rounded-t-md" />
+                           <div className="border border-t-0 rounded-b-md p-1.5 space-y-1.5">
+                             <Skeleton className="h-6 w-full" />
+                             <Skeleton className="h-6 w-full" />
                            </div>
                          </div>
-                         <div className="flex flex-col items-end mb-6">
-                           <Skeleton className="h-20 w-1/2 max-w-sm" />
+                         <div className="flex flex-col items-end mb-4">
+                           <Skeleton className="h-16 w-1/2 max-w-xs" />
                          </div>
-                         <Skeleton className="h-16 w-full" />
-                         <Skeleton className="h-4 w-32 mx-auto mt-12" />
+                         <Skeleton className="h-12 w-full" />
+                         <Skeleton className="h-3 w-28 mx-auto mt-8" />
                    </div>
                 </CardContent>
             </Card>
@@ -140,14 +140,14 @@ export default function ViewInvoicePage(props: ViewInvoicePageProps) {
 
   // Render invoice preview if loaded
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background print:bg-white print:p-0">
+    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 md:p-6 bg-background print:bg-white print:p-0"> {/* Reduced padding */}
       <Card className="w-full max-w-4xl shadow-lg print:shadow-none print:border-none">
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 border-b mb-4 print:hidden">
-          <CardTitle className="text-xl sm:text-2xl font-bold text-primary">View Invoice #{invoice?.invoiceNumber || '...'}</CardTitle>
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2 border-b mb-3 print:hidden p-3 sm:p-4"> {/* Reduced padding/margin */}
+          <CardTitle className="text-lg sm:text-xl font-bold text-primary">View Invoice #{invoice?.invoiceNumber || '...'}</CardTitle> {/* Adjusted font size */}
           {/* Pass invoiceId to actions */}
           {invoice?._id && <InvoiceViewActions invoiceId={invoice._id} />}
         </CardHeader>
-        <CardContent className="p-0 sm:p-6 print:p-0">
+        <CardContent className="p-0 sm:p-4 print:p-0"> {/* Reduced padding */}
           {invoice ? (
             <InvoicePreview data={{
               ...invoice,
@@ -160,7 +160,7 @@ export default function ViewInvoicePage(props: ViewInvoicePageProps) {
             }} />
           ) : (
              // This case should ideally not be reached
-             <div className="p-6 text-center text-muted-foreground">Invoice data could not be displayed.</div>
+             <div className="p-4 text-center text-muted-foreground text-sm">Invoice data could not be displayed.</div>
           )}
         </CardContent>
       </Card>

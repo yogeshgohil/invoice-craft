@@ -118,37 +118,37 @@ export function InvoiceFilters({ initialFilters }: InvoiceFiltersProps) {
     if (!isClient) {
         // Render minimal placeholders or null during SSR/initial render
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end mb-6 animate-pulse">
-                 <div className="h-10 bg-muted rounded-md"></div>
-                 <div className="h-10 bg-muted rounded-md"></div>
-                 <div className="h-10 bg-muted rounded-md"></div>
-                 <div className="h-10 bg-muted rounded-md"></div>
-                 <div className="h-10 bg-muted rounded-md"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 items-end mb-4 sm:mb-6 animate-pulse"> {/* Reduced gap/margin */}
+                 <div className="h-9 bg-muted rounded-md"></div> {/* Reduced height */}
+                 <div className="h-9 bg-muted rounded-md"></div>
+                 <div className="h-9 bg-muted rounded-md"></div>
+                 <div className="h-9 bg-muted rounded-md"></div>
+                 <div className="h-9 bg-muted rounded-md"></div>
             </div>
         );
     }
 
 
     return (
-         // Adjusted grid columns for responsiveness: 1 col on mobile, 2 on sm, 3 on md, 5 on lg
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-end mb-6">
+         // Use single column layout on mobile, adjust gaps
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 items-end mb-4 sm:mb-6"> {/* Reduced gap/margin */}
             {/* Customer Name Filter */}
             <div className="space-y-1">
-                <Label htmlFor="customerNameFilter" className="text-sm">Customer Name</Label>
+                <Label htmlFor="customerNameFilter" className="text-xs sm:text-sm">Customer Name</Label> {/* Smaller label */}
                 <Input
                     id="customerNameFilter"
                     placeholder="Filter by name..."
                     value={customerName}
                     onChange={handleCustomerNameChange}
-                    className="h-9 sm:h-10" // Adjust height for smaller screens
+                    className="h-9 text-sm" // Adjust height and font size
                 />
             </div>
 
             {/* Status Filter */}
             <div className="space-y-1">
-                <Label htmlFor="statusFilter" className="text-sm">Status</Label>
+                <Label htmlFor="statusFilter" className="text-xs sm:text-sm">Status</Label> {/* Smaller label */}
                 <Select value={status || 'all'} onValueChange={handleStatusChange}>
-                    <SelectTrigger id="statusFilter" className="h-9 sm:h-10">
+                    <SelectTrigger id="statusFilter" className="h-9 text-sm"> {/* Adjust height and font size */}
                         <SelectValue placeholder="Filter by status..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -164,19 +164,19 @@ export function InvoiceFilters({ initialFilters }: InvoiceFiltersProps) {
 
             {/* Due Date Start Filter */}
             <div className="space-y-1">
-                 <Label htmlFor="dueDateStartFilter" className="text-sm">Due Date From</Label>
+                 <Label htmlFor="dueDateStartFilter" className="text-xs sm:text-sm">Due Date From</Label> {/* Smaller label */}
                  <Popover>
                      <PopoverTrigger asChild>
                          <Button
                              id="dueDateStartFilter"
                              variant={"outline"}
                              className={cn(
-                                 "w-full justify-start text-left font-normal h-9 sm:h-10 text-xs sm:text-sm", // Adjust size and text
+                                 "w-full justify-start text-left font-normal h-9 text-xs", // Adjust height and text size
                                  !dueDateStart && "text-muted-foreground"
                              )}
                          >
-                             <CalendarIcon className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                             {dueDateStart ? format(dueDateStart, "PPP") : <span>Pick a start date</span>}
+                             <CalendarIcon className="mr-1 h-3.5 w-3.5" /> {/* Adjust icon size/margin */}
+                             {dueDateStart ? format(dueDateStart, "PPP") : <span>Start date</span>} {/* Shorter placeholder */}
                          </Button>
                      </PopoverTrigger>
                      <PopoverContent className="w-auto p-0">
@@ -195,19 +195,19 @@ export function InvoiceFilters({ initialFilters }: InvoiceFiltersProps) {
 
              {/* Due Date End Filter */}
              <div className="space-y-1">
-                 <Label htmlFor="dueDateEndFilter" className="text-sm">Due Date To</Label>
+                 <Label htmlFor="dueDateEndFilter" className="text-xs sm:text-sm">Due Date To</Label> {/* Smaller label */}
                  <Popover>
                      <PopoverTrigger asChild>
                          <Button
                              id="dueDateEndFilter"
                              variant={"outline"}
                              className={cn(
-                                 "w-full justify-start text-left font-normal h-9 sm:h-10 text-xs sm:text-sm", // Adjust size and text
+                                 "w-full justify-start text-left font-normal h-9 text-xs", // Adjust height and text size
                                  !dueDateEnd && "text-muted-foreground"
                              )}
                          >
-                             <CalendarIcon className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                             {dueDateEnd ? format(dueDateEnd, "PPP") : <span>Pick an end date</span>}
+                             <CalendarIcon className="mr-1 h-3.5 w-3.5" /> {/* Adjust icon size/margin */}
+                             {dueDateEnd ? format(dueDateEnd, "PPP") : <span>End date</span>} {/* Shorter placeholder */}
                          </Button>
                      </PopoverTrigger>
                      <PopoverContent className="w-auto p-0">
@@ -225,16 +225,17 @@ export function InvoiceFilters({ initialFilters }: InvoiceFiltersProps) {
              </div>
 
             {/* Clear Filters Button */}
-             {/* Adjust button size and make full width on smaller screens */}
+             {/* Make full width on mobile */}
              <Button
                 variant="outline"
                 size="sm"
                 onClick={clearFilters}
-                className="w-full h-9 lg:w-auto lg:h-10 self-end mt-2 sm:mt-0 lg:mt-auto" // Full width on mobile/sm, auto on larger, adjust margins
+                className="w-full h-9 lg:w-auto lg:h-10 self-end mt-1 sm:mt-0 lg:mt-auto text-xs sm:text-sm" // Full width on mobile, adjust margins/text size
                 disabled={!customerName && !status && !dueDateStart && !dueDateEnd} // Disable if no filters active
             >
-                 <X className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" /> Clear Filters
+                 <X className="mr-1 h-3.5 w-3.5" /> Clear Filters {/* Adjust icon size/margin */}
              </Button>
         </div>
     );
 }
+

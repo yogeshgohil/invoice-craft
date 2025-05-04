@@ -58,25 +58,25 @@ export default function EditInvoicePage(props: EditInvoicePageProps) {
   // Render loading state
   if (isLoading) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
+      <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 md:p-6 bg-background"> {/* Reduced padding */}
          <Card className="w-full max-w-6xl shadow-lg border border-border rounded-xl overflow-hidden">
-           <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4 border-b p-4 sm:p-6 bg-card">
+           <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
              <div>
-               <Skeleton className="h-6 w-48 mb-1 rounded" />
-               <Skeleton className="h-4 w-64 rounded" />
+               <Skeleton className="h-5 w-40 mb-1 rounded" /> {/* Adjusted size */}
+               <Skeleton className="h-3 w-56 rounded" /> {/* Adjusted size */}
              </div>
-             <Skeleton className="h-9 w-32 sm:w-40 rounded-md" />
+             <Skeleton className="h-8 w-28 sm:w-36 rounded-md" /> {/* Adjusted size */}
            </CardHeader>
            <CardContent className="p-0">
                {/* Simplified skeleton for the form area */}
-               <div className="p-6 space-y-6">
-                   <Skeleton className="h-40 w-full rounded-md" />
-                   <Skeleton className="h-60 w-full rounded-md" />
-                   <Skeleton className="h-20 w-full rounded-md" />
+               <div className="p-4 space-y-4"> {/* Reduced padding/spacing */}
+                   <Skeleton className="h-32 w-full rounded-md" />
+                   <Skeleton className="h-48 w-full rounded-md" />
+                   <Skeleton className="h-16 w-full rounded-md" />
                    <div className="flex flex-wrap justify-end gap-2">
-                       <Skeleton className="h-9 w-24 rounded-md" />
-                       <Skeleton className="h-9 w-24 rounded-md" />
-                       <Skeleton className="h-9 w-32 rounded-md" />
+                       <Skeleton className="h-8 w-20 rounded-md" /> {/* Adjusted size */}
+                       <Skeleton className="h-8 w-20 rounded-md" />
+                       <Skeleton className="h-8 w-28 rounded-md" />
                    </div>
                </div>
            </CardContent>
@@ -108,18 +108,18 @@ export default function EditInvoicePage(props: EditInvoicePageProps) {
 
   // Render form if data is loaded successfully
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
+    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 md:p-6 bg-background"> {/* Reduced padding */}
       <Card className="w-full max-w-6xl shadow-lg border border-border rounded-xl overflow-hidden">
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4 border-b p-4 sm:p-6 bg-card">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
             <div>
-                <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Edit Invoice</CardTitle>
-                 <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-1">
+                <CardTitle className="text-base sm:text-lg font-semibold text-foreground">Edit Invoice</CardTitle> {/* Adjusted font size */}
+                 <CardDescription className="text-[10px] sm:text-xs text-muted-foreground mt-0.5"> {/* Adjusted font size and margin */}
                     Update details for Invoice #{invoice?.invoiceNumber || '...'}
                  </CardDescription>
             </div>
           <Link href="/invoices" passHref>
-            <Button variant="outline" size="sm" className="w-full sm:w-auto">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Invoices
+            <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"> {/* Adjusted size */}
+              <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back to Invoices {/* Adjusted icon margin/size */}
             </Button>
           </Link>
         </CardHeader>
@@ -128,7 +128,7 @@ export default function EditInvoicePage(props: EditInvoicePageProps) {
               <InvoiceForm initialData={invoice} />
            ) : (
               // This case should ideally not be reached if loading/error states are handled
-              <div className="p-6 text-center text-muted-foreground">Invoice data could not be loaded.</div>
+              <div className="p-4 text-center text-muted-foreground text-sm">Invoice data could not be loaded.</div>
            )}
         </CardContent>
       </Card>

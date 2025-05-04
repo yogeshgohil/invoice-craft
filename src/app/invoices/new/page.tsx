@@ -9,18 +9,20 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function CreateInvoicePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-6 md:p-8 bg-background">
+     // Reduced padding for mobile view
+    <main className="flex min-h-screen flex-col items-center justify-start p-2 sm:p-4 md:p-6 bg-background">
        <Card className="w-full max-w-6xl shadow-lg border border-border rounded-xl overflow-hidden"> {/* Rounded Card */}
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4 border-b p-4 sm:p-6 bg-card">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-3 border-b p-3 sm:p-4 bg-card"> {/* Reduced padding */}
            <div> {/* Group title and description */}
-               <CardTitle className="text-lg sm:text-xl font-semibold text-foreground">Create New Bill</CardTitle>
-                <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-1">
+               <CardTitle className="text-base sm:text-lg font-semibold text-foreground">Create New Bill</CardTitle> {/* Adjusted font size */}
+                <CardDescription className="text-[10px] sm:text-xs text-muted-foreground mt-0.5"> {/* Adjusted font size and margin */}
                    Fill in the details below to generate a new invoice.
                 </CardDescription>
            </div>
            <Link href="/invoices" passHref>
-            <Button variant="outline" size="sm" className="w-full sm:w-auto">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Invoices
+             {/* Adjusted button size */}
+            <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
+              <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back to Invoices {/* Adjusted icon margin/size */}
             </Button>
           </Link>
         </CardHeader>

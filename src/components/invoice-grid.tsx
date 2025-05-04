@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Invoice } from '@/app/invoices/page';
@@ -196,9 +197,10 @@ export function InvoiceGrid({ initialInvoices }: InvoiceGridProps) {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+       {/* Reduced gap for mobile, slightly decreased column width */}
       <div className={cn(
-          "flex gap-4 md:gap-5 lg:gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-muted-foreground/40 scrollbar-track-background", // Use softer scrollbar colors
-          isDragging && "cursor-grabbing" // Add grabbing cursor style when dragging
+          "flex gap-3 md:gap-4 lg:gap-5 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-muted-foreground/40 scrollbar-track-background",
+          isDragging && "cursor-grabbing"
       )}>
         {statusOrder.map((status) => (
           <Droppable key={status} droppableId={status} isDropDisabled={status === 'Due Today'}>
@@ -206,46 +208,46 @@ export function InvoiceGrid({ initialInvoices }: InvoiceGridProps) {
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                // Adjust width and background
+                // Adjust width and background for mobile
                 className={cn(
-                  "flex flex-col gap-4 flex-shrink-0 w-60 sm:w-64 md:w-72 rounded-lg", // Slightly narrower width
-                  "bg-secondary/50", // Use secondary background for the column
-                  snapshot.isDraggingOver && status !== 'Due Today' && "bg-primary/10 ring-1 ring-primary/30", // Subtle highlight
-                  status === 'Due Today' ? "border border-dashed border-secondary bg-secondary/20" : "border border-transparent" // Style "Due Today" column differently
+                  "flex flex-col gap-3 flex-shrink-0 w-52 sm:w-56 md:w-64 rounded-lg", // Smaller width for mobile
+                  "bg-secondary/50",
+                  snapshot.isDraggingOver && status !== 'Due Today' && "bg-primary/10 ring-1 ring-primary/30",
+                  status === 'Due Today' ? "border border-dashed border-secondary bg-secondary/20" : "border border-transparent"
                 )}
               >
-                {/* Column Header - Remains sticky */}
+                {/* Column Header - Remains sticky, adjusted padding */}
                 <div className={cn(
-                    "flex items-center justify-between px-3 py-2 rounded-t-md sticky top-0 z-10 border-b", // Add border-b for separation
-                     status === 'Due Today' ? "bg-secondary/40" : "bg-secondary/80" // Header background matches column style
+                    "flex items-center justify-between px-2 py-1.5 rounded-t-md sticky top-0 z-10 border-b", // Reduced padding
+                     status === 'Due Today' ? "bg-secondary/40" : "bg-secondary/80"
                     )}>
-                   <div className="flex items-center gap-1.5">
-                       {status !== 'Due Today' && <GripVertical className="h-3.5 w-3.5 text-muted-foreground/50" />} {/* Drag handle hint */}
+                   <div className="flex items-center gap-1"> {/* Reduced gap */}
+                       {status !== 'Due Today' && <GripVertical className="h-3 w-3 text-muted-foreground/50" />} {/* Smaller icon */}
                        <h3 className={cn(
-                         "font-medium text-xs sm:text-sm capitalize", // Use medium font weight
+                         "font-medium text-[10px] sm:text-xs capitalize", // Smaller font size
                          status === 'Due Today' ? "text-secondary-foreground" : "text-muted-foreground"
                        )}>
-                         {status} {status === 'Due Today' && <Badge variant="secondary" className='ml-1 text-[10px] px-1 py-0 sm:px-1.5'>Dynamic</Badge>}
+                         {status} {status === 'Due Today' && <Badge variant="secondary" className='ml-1 text-[9px] px-1 py-0'>Dynamic</Badge>} {/* Smaller badge */}
                        </h3>
                    </div>
-                  <Badge variant={getStatusVariant(status)} className="text-[10px] px-1.5 py-0 sm:px-2 sm:py-0.5 shadow-sm"> {/* Add subtle shadow */}
+                  {/* Smaller badge */}
+                  <Badge variant={getStatusVariant(status)} className="text-[9px] px-1 py-0 sm:px-1.5 shadow-sm">
                     {groupedInvoices[status]?.length || 0}
                   </Badge>
                 </div>
 
-                {/* Invoice Cards Container - Scrolls vertically */}
+                {/* Invoice Cards Container - Scrolls vertically, adjusted gap/padding */}
                 <div className={cn(
-                    "flex flex-col gap-3 sm:gap-3.5 overflow-y-auto flex-grow min-h-[150px] sm:min-h-[200px] max-h-[calc(100vh-250px)] p-2 rounded-b-md scrollbar-thin scrollbar-thumb-muted-foreground/40 scrollbar-track-background", // Adjusted gap and softer scrollbar
-                    isDragging && "select-none" // Prevent text selection during drag
+                    "flex flex-col gap-2 sm:gap-2.5 overflow-y-auto flex-grow min-h-[120px] sm:min-h-[150px] max-h-[calc(100vh-200px)] p-1.5 rounded-b-md scrollbar-thin scrollbar-thumb-muted-foreground/40 scrollbar-track-background", // Reduced gap/padding
+                    isDragging && "select-none"
                  )}>
                   {(groupedInvoices[status] || []).length > 0 ? (
                     (groupedInvoices[status] || [])
-                       // Sort by invoice date descending within column (optional, consider performance)
                       .sort((a, b) => {
                          const dateA = parseDateSafe(a.invoiceDate);
                          const dateB = parseDateSafe(b.invoiceDate);
                          if (!dateA && !dateB) return 0;
-                         if (!dateA) return 1; // Place invoices with invalid dates at the end
+                         if (!dateA) return 1;
                          if (!dateB) return -1;
                          return dateB.getTime() - dateA.getTime();
                        })
@@ -267,40 +269,44 @@ export function InvoiceGrid({ initialInvoices }: InvoiceGridProps) {
                                     ...provided.draggableProps.style,
                                 }}
                                 className={cn(
-                                    "outline-none", // Remove default outline
-                                    snapshot.isDragging && "ring-2 ring-primary shadow-xl rounded-lg", // Style when dragging
-                                    status === 'Due Today' && "opacity-80 cursor-not-allowed" // Indicate non-draggable for Due Today
+                                    "outline-none",
+                                    snapshot.isDragging && "ring-2 ring-primary shadow-xl rounded-lg",
+                                    status === 'Due Today' && "opacity-80 cursor-not-allowed"
                                 )}
                               >
                                 <Card
                                   className={cn(
-                                    "shadow-sm hover:shadow-md transition-shadow duration-200 flex-shrink-0 bg-card relative group", // Added group for hover effects
-                                    isDragging && "cursor-grabbing", // Cursor style for the card itself
-                                    isUpdating === invoice._id && "opacity-60 pointer-events-none", // Style for updating state
-                                    snapshot.isDragging && "border-primary" // Add border when dragging
+                                    "shadow-sm hover:shadow-md transition-shadow duration-200 flex-shrink-0 bg-card relative group",
+                                    isDragging && "cursor-grabbing",
+                                    isUpdating === invoice._id && "opacity-60 pointer-events-none",
+                                    snapshot.isDragging && "border-primary"
                                   )}
                                 >
                                    {isUpdating === invoice._id && (
                                        <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-20 rounded-md">
-                                           <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin text-primary" />
+                                           <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-primary" /> {/* Smaller loader */}
                                        </div>
                                    )}
-                                  <CardHeader className="p-2 sm:p-3 pb-1 flex flex-row items-center justify-between space-y-0"> {/* Flex row for title/badge */}
-                                      <CardTitle className="text-xs sm:text-sm font-medium"> {/* Medium weight */}
+                                  {/* Reduced padding/font size in header */}
+                                  <CardHeader className="p-1.5 sm:p-2 pb-0.5 flex flex-row items-center justify-between space-y-0">
+                                      <CardTitle className="text-[10px] sm:text-xs font-medium truncate max-w-[100px] sm:max-w-[120px]"> {/* Truncate */}
                                         <span>{invoice.invoiceNumber}</span>
                                       </CardTitle>
-                                      <Badge variant={getStatusVariant(invoice.status)} className="text-[9px] sm:text-[10px] font-normal ml-2 capitalize px-1 sm:px-1.5 py-0.5 leading-tight"> {/* Smaller badge */}
+                                      {/* Smaller badge */}
+                                      <Badge variant={getStatusVariant(invoice.status)} className="text-[8px] sm:text-[9px] font-normal ml-1 capitalize px-1 py-0 leading-tight">
                                         {invoice.status}
                                       </Badge>
                                   </CardHeader>
-                                   <CardContent className="p-2 sm:p-3 pt-0 text-[10px] sm:text-xs space-y-0.5 sm:space-y-1">
-                                    <CardDescription className="text-[10px] sm:text-xs text-muted-foreground pt-0 sm:pt-0.5 truncate">
+                                   {/* Reduced padding/font size in content */}
+                                   <CardContent className="p-1.5 sm:p-2 pt-0 text-[9px] sm:text-[10px] space-y-0.5">
+                                    <CardDescription className="text-[9px] sm:text-[10px] text-muted-foreground pt-0 sm:pt-0.5 truncate">
                                       {invoice.customerName}
                                     </CardDescription>
                                     <p><span className="text-muted-foreground/80">Inv:</span> {formatDate(parsedInvoiceDate)}</p>
                                     <p className={cn(isDue && "text-amber-600 font-medium")}><span className="text-muted-foreground/80">Due:</span> {formatDate(parsedDueDate)}</p>
                                   </CardContent>
-                                  <CardFooter className="p-2 sm:p-3 pt-1 flex justify-between items-center text-[10px] sm:text-xs border-t mt-1 sm:mt-2">
+                                  {/* Reduced padding/font size in footer */}
+                                  <CardFooter className="p-1.5 sm:p-2 pt-1 flex justify-between items-center text-[9px] sm:text-[10px] border-t mt-1 sm:mt-1.5">
                                     <span className="text-muted-foreground">Total: {formatCurrency(totalAmount)}</span>
                                     <span className={cn("font-semibold", totalDue > 0 ? "text-destructive" : "text-primary")}>
                                       Due: {formatCurrency(totalDue)}
@@ -313,8 +319,8 @@ export function InvoiceGrid({ initialInvoices }: InvoiceGridProps) {
                         );
                       })
                   ) : (
-                    // Placeholder for empty columns
-                    <div className="text-center text-xs text-muted-foreground/70 mt-4 p-4 border border-dashed border-muted rounded-md h-20 sm:h-24 flex items-center justify-center">
+                    // Placeholder for empty columns, adjusted padding/size
+                    <div className="text-center text-[10px] text-muted-foreground/70 mt-3 p-3 border border-dashed border-muted rounded-md h-16 sm:h-20 flex items-center justify-center">
                       No invoices in {status.toLowerCase()}
                     </div>
                   )}
