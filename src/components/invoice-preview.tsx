@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { InvoiceFormData } from './invoice-form'; // Ensure this path is correct
@@ -77,7 +78,7 @@ export function InvoicePreview({ data }: InvoicePreviewProps) {
            {/* Your Company Details */}
            <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-700">Mahakali Ariwork</h2> {/* Smaller text */}
            <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500">41, Panchavati Society, Bapasitaram Chowk,Kataragam, Surat.</p> {/* Smaller text */}
-           <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500">your.email@example.com</p> {/* Smaller text */}
+           <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500">jagadishbhai350@gmail.com</p> {/* Smaller text */}
            <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500">8141437848</p> {/* Smaller text */}
         </div>
       </div>
@@ -211,5 +212,6 @@ if (typeof window !== 'undefined') {
     document.head.appendChild(styleSheet);
   }
 }
+
 
 
