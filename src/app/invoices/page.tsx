@@ -1,5 +1,5 @@
 
-'use client'; // Convert to Client Component
+'use client'; // Ensure this page runs client-side
 
 import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -179,13 +179,13 @@ function InvoicesContent() {
                  // Show a skeleton loading indicator only on initial load
                  <div className="space-y-3"> {/* Reduced spacing */}
                       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2"> {/* Adjusted layout, reduced margin */}
-                         <div className="flex items-center justify-start space-x-1.5 order-2 sm:order-1"> {/* Group view toggles */}
-                           <Skeleton className="h-8 w-8 rounded-md" />
-                           <Skeleton className="h-8 w-8 rounded-md" />
-                         </div>
-                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2"> {/* Group create/report */}
-                           <Skeleton className="h-8 w-full sm:w-36 rounded-md" />
-                           <Skeleton className="h-8 w-full sm:w-32 rounded-md" />
+                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2"> {/* Group buttons */}
+                            <div className="flex items-center justify-start order-3 sm:order-1"> {/* Align start */}
+                                <Skeleton className="h-8 w-8 rounded-md mr-1.5" />
+                                <Skeleton className="h-8 w-8 rounded-md" />
+                             </div>
+                             <Skeleton className="h-8 w-full sm:w-36 rounded-md order-2 sm:order-2" /> {/* Create button */}
+                             <Skeleton className="h-8 w-full sm:w-32 rounded-md order-1 sm:order-3" /> {/* Report button */}
                          </div>
                       </div>
                      {/* Skeleton for List View */}
@@ -227,6 +227,7 @@ function InvoicesContent() {
 export default function InvoicesPage() {
    // Wrap content in Suspense to handle client-side data fetching states
     return (
+        // Removed justify-center as Card now has max-width
         <main className="flex min-h-screen flex-col items-center p-2 sm:p-4 bg-background">
             <Suspense fallback={<LoadingSkeleton />}>
                 <InvoicesContent />
@@ -254,15 +255,15 @@ function LoadingSkeleton() {
                 <Separator className="my-3 sm:my-4" />
                  {/* Skeleton for View Switcher */}
                 <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-3 gap-2">
-                     <div className="flex items-center justify-start space-x-1.5 order-2 sm:order-1"> {/* Group view toggles */}
-                       <Skeleton className="h-8 w-8 rounded-md" />
-                       <Skeleton className="h-8 w-8 rounded-md" />
-                     </div>
-                     <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch order-1 sm:order-2"> {/* Group create/report */}
-                       <Skeleton className="h-8 w-full sm:w-36 rounded-md" />
-                       <Skeleton className="h-8 w-full sm:w-32 rounded-md" />
-                     </div>
-                </div>
+                      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-stretch"> {/* Group buttons */}
+                          <div className="flex items-center justify-start order-3 sm:order-1"> {/* Align start */}
+                              <Skeleton className="h-8 w-8 rounded-md mr-1.5" />
+                              <Skeleton className="h-8 w-8 rounded-md" />
+                           </div>
+                           <Skeleton className="h-8 w-full sm:w-36 rounded-md order-2 sm:order-2" /> {/* Create button */}
+                           <Skeleton className="h-8 w-full sm:w-32 rounded-md order-1 sm:order-3" /> {/* Report button */}
+                      </div>
+                 </div>
                 {/* Skeleton for List View */}
                 <div className="rounded-lg border animate-pulse">
                     <Skeleton className="h-10 w-full rounded-t-md" />
